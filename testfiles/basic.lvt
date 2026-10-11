@@ -1,0 +1,25 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{derham}
+\begin{document}
+\START
+\TYPE{default complex and commuting}
+\[\derhamcomplex\]
+\[\derhamcommuting\]
+\TYPE{dimensions and notation}
+\[\derhamcomplex[dimension=1,notation=vector,spaces=sobolev]\]
+\[\derhamcomplex[dimension=2,notation=vector,spaces=sobolev]\]
+\[\derhamcomplex[dimension=3,notation=vector,spaces=sobolev]\]
+\[\derhamcomplex[notation=forms,spaces=sobolev]\]
+\TYPE{discrete, truncation, zero objects}
+\[\derhamcomplex[dimension=2,discrete=true]\]
+\[\derhamcomplex[from=1,to=2,zero-start=true,zero-end=true]\]
+\TYPE{custom labels and directions}
+\[\derhamcommuting[dimension=2,custom-spaces={X^0,X^1,X^2},custom-discrete-spaces={X_h^0,X_h^1,X_h^2},operators={D_0,D_1},discrete-operators={D_{h,0},D_{h,1}},maps={P_0,P_1,P_2},space-1=Y,operator-0=A,discrete-operator-1=B,map-2=Q,map-direction-1=up]\]
+\TYPE{global setup and local override}
+\derhamsetup{dimension=2}
+\[\derhamcomplex\]
+\[\derhamcomplex[dimension=1]\]
+\END
+\end{document}

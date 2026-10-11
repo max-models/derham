@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage[a4paper,margin=20mm]{geometry}
+\usepackage{derham}
+\begin{document}
+\section*{Commuting diagrams}
+\[\derhamcommuting[dimension=2,notation=forms,spaces=sobolev]\]
+\[\derhamcommuting[dimension=2,vertical-direction=up,projection=\iota_h]\]
+\[\derhamcommuting[
+  dimension=2,
+  custom-spaces={X^0,X^1,X^2},
+  custom-discrete-spaces={X_h^0,X_h^1,X_h^2},
+  operators={D_0,D_1},
+  discrete-operators={D_{h,0},D_{h,1}},
+  maps={P_0,P_1,P_2},
+  space-1=Y,
+  operator-0=A,
+  discrete-operator-1=B,
+  map-2=Q,
+  map-direction-1=up
+]\]
+\end{document}

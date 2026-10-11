@@ -1,0 +1,225 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=26mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{needspace}
+\usepackage{longtable}
+\usepackage{derham}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newcommand\pkg[1]{\textsf{#1}}
+\newcommand\opt[1]{\texttt{#1}}
+\title{\textsf{derham}\\[4pt]\large De Rham complexes and FEEC diagrams in LaTeX}
+\author{derham contributors}
+\date{Version 0.2.0 --- 11 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+\pkg{derham} builds de Rham complexes and finite element exterior calculus (FEEC) diagrams from mathematical labels. It uses \pkg{tikz-cd} for layout and provides independent control of spaces, differential operators, and inter-row maps.
+\end{abstract}
+\begin{center}
+\small LPPL 1.3c or later. Version 0.2.0 adds the compositional API, mapped and coefficient-space diagrams, and generic dual and broken layouts. See \texttt{CHANGELOG.md} for the release history.
+\end{center}
+\tableofcontents
+\clearpage
+
+\section{Installation and five-minute start}
+Copy \texttt{derham.sty} beside your document or install it in a local \TeX{} tree. The package requires a current LaTeX kernel, \pkg{amsmath}, and \pkg{tikz-cd}. Then write:
+\begin{verbatim}
+\usepackage{derham}
+...
+\[\derhamcomplex\]
+\[\derhamcommuting\]
+\end{verbatim}
+The two commands render, respectively:
+\[\derhamcomplex\]
+\[\derhamcommuting\]
+Both commands produce a math object and belong in math mode. They work inside \verb|\[...\]| and \texttt{equation}; do not wrap them in another \texttt{tikzcd} environment. A one-row discrete complex is obtained with \opt{discrete=true}.
+
+\section{Notation and mathematical meaning}
+The default is the generic sequence $V^0 \xrightarrow{d^0} V^1 \xrightarrow{d^1}\cdots\xrightarrow{d^{n-1}}V^n$. Its discrete spaces are $V_h^k$ with arrows $d_h^k$; vertical maps have labels $\pi_h^k$. These symbols are labels, not definitions of spaces or maps. Drawing a square does not establish that it commutes, nor does adding zero objects establish exactness.
+
+Choose \opt{notation=forms} with \opt{spaces=sobolev} to label the continuous row $H\Lambda^k(\Omega)$.
+
+With \opt{notation=vector} and \opt{spaces=sobolev}, the conventions in dimensions 1, 2, and 3 are:
+\[\derhamcomplex[dimension=1,notation=vector,spaces=sobolev]\]
+\[\derhamcomplex[dimension=2,notation=vector,spaces=sobolev]\]
+\[\derhamcomplex[dimension=3,notation=vector,spaces=sobolev]\]
+The two-dimensional \(\operatorname{curl}\) in this preset is scalar valued. If your vector proxy or boundary conditions use a different convention, supply explicit labels. Discrete spaces default to generic $V_h^k$ even when the continuous row uses Sobolev names, because the precise finite element spaces depend on the discretization.
+
+\Needspace{.25\textheight}
+\section{Continuous and discrete complexes}
+\begin{verbatim}
+\[\derhamcomplex[dimension=3,notation=vector,spaces=sobolev]\]
+\end{verbatim}
+\[\derhamcomplex[dimension=3,notation=vector,spaces=sobolev]\]
+\begin{verbatim}
+\[\derhamcomplex[dimension=2,discrete=true]\]
+\end{verbatim}
+\[\derhamcomplex[dimension=2,discrete=true]\]
+
+Choose a consecutive degree interval with \opt{from} and \opt{to}; the defaults are $0$ and \opt{dimension}. Optional zero objects are visual endpoints only:
+\begin{verbatim}
+\[\derhamcomplex[from=1,to=3,zero-start=true,zero-end=true]\]
+\end{verbatim}
+\[\derhamcomplex[from=1,to=3,zero-start=true,zero-end=true]\]
+
+\section{Commuting diagrams}
+\begin{verbatim}
+\[\derhamcommuting[dimension=2,notation=forms,spaces=sobolev]\]
+\end{verbatim}
+\[\derhamcommuting[dimension=2,notation=forms,spaces=sobolev]\]
+Use \opt{vertical-direction=up} when the maps point from the discrete row to the continuous row. The \opt{projection} key changes the base symbol of automatically indexed labels. For arbitrary labels, use \opt{maps} or individual \opt{map-\emph{k}} options.
+\begin{verbatim}
+\[\derhamcommuting[
+  dimension=2,
+  vertical-direction=up,
+  maps={I^0,I^1,I^2}
+]\]
+\end{verbatim}
+\[\derhamcommuting[dimension=2,vertical-direction=up,maps={I^0,I^1,I^2}]\]
+Individual arrows can be reversed with \opt{map-direction-\emph{k}=up} or \opt{down}. A mixed-direction diagram may have a different mathematical interpretation from a commuting projection diagram; the author must specify the intended identities.
+
+\Needspace{.27\textheight}
+\section{Custom spaces and operators}
+List options use braces around the entire comma-separated list. An item containing a comma must itself be braced. Lists cover all degrees $0,\ldots,n$, even if a range is shown. \opt{operators} and \opt{discrete-operators} each contain $n$ items; \opt{maps} contains $n+1$.
+\begin{verbatim}
+\[\derhamcommuting[
+  dimension=2,
+  custom-spaces={X^0,X^1,X^2},
+  custom-discrete-spaces={X_h^0,X_h^1,X_h^2},
+  operators={D_0,D_1},
+  discrete-operators={D_{h,0},D_{h,1}},
+  maps={P_0,P_1,P_2}
+]\]
+\end{verbatim}
+\[\derhamcommuting[dimension=2,custom-spaces={X^0,X^1,X^2},custom-discrete-spaces={X_h^0,X_h^1,X_h^2},operators={D_0,D_1},discrete-operators={D_{h,0},D_{h,1}},maps={P_0,P_1,P_2}]\]
+The indexed keys \opt{space-0} through \opt{space-3}, \opt{discrete-space-0} through \opt{discrete-space-3}, \opt{operator-0} through \opt{operator-2}, \opt{discrete-operator-0} through \opt{discrete-operator-2}, and \opt{map-0} through \opt{map-3} replace one label. An indexed override takes priority over a list, which takes priority over a preset. Indices outside the selected dimension produce an error.
+
+For a plasma-oriented paper, spaces and operators might be named by the particular compatible spline discretization. The package does not choose those spaces:
+\begin{verbatim}
+\[\derhamcommuting[
+  dimension=3,
+  custom-discrete-spaces={V_h^0,V_h^1,V_h^2,V_h^3},
+  discrete-operators={\nabla_h,\nabla_h\times,\nabla_h\cdot},
+  maps={\Pi_h^0,\Pi_h^1,\Pi_h^2,\Pi_h^3}
+]\]
+\end{verbatim}
+\[\derhamcommuting[dimension=3,custom-discrete-spaces={V_h^0,V_h^1,V_h^2,V_h^3},discrete-operators={\nabla_h,\nabla_h\times,\nabla_h\cdot},maps={\Pi_h^0,\Pi_h^1,\Pi_h^2,\Pi_h^3}]\]
+This is an illustrative labeling, not a reproduction of a specific published diagram.
+
+\Needspace{.35\textheight}
+\section{Mapped domains}
+For a map $F:\widehat\Omega\to\Omega$, pullback has the contravariant direction $F^*:H\Lambda^k(\Omega)\to H\Lambda^k(\widehat\Omega)$. The default preset draws physical spaces above reference spaces and points the pullback arrows down. The exterior derivative and pullback satisfy $F^*d=dF^*$ when the relevant spaces and map meet the required hypotheses; the package only displays the labels.
+\begin{verbatim}
+\[\derhammapped[dimension=2,notation=forms,spaces=sobolev]\]
+\end{verbatim}
+\[\derhammapped[dimension=2,notation=forms,spaces=sobolev]\]
+Use \opt{geometry-direction=physical-to-reference} when the geometric map points from $\Omega$ to $\widehat\Omega$. The pullback then points up. Set \opt{pullback} to its actual symbol, for example \verb|pullback=G^*| for $G:\Omega\to\widehat\Omega$. \opt{reference-spaces} and \opt{reference-operators} accept full lists; \opt{maps} and individual \opt{map-\emph{k}} keys replace pullback labels.
+
+\section{Coefficient spaces}
+The coefficient preset places discrete function spaces above coefficient spaces. Its default coefficient objects are $\mathbb R^{N_k}$, horizontal maps are $G,C,D$ in three dimensions, and vertical maps are labeled $\operatorname{DoF}^k$.
+\begin{verbatim}
+\[\derhamcoefficients[dimension=3]\]
+\end{verbatim}
+\[\derhamcoefficients[dimension=3]\]
+The labels $G,C,D$ denote user-chosen matrices. They do not prescribe a basis or imply identity mass matrices. Use \opt{coefficient-spaces}, \opt{coefficient-operators}, and \opt{maps} for full lists; \opt{dof} changes the base symbol for indexed vertical maps. A reconstruction diagram can use \opt{vertical-direction=up} with appropriate reconstruction labels.
+
+\Needspace{.45\textheight}
+\section{Named multilevel diagrams}
+The \texttt{derhamdiagram} environment works in math mode. Declare named rows and connect them by name. Connections may precede row declarations; row IDs must be unique. An omitted \opt{degree} connects all corresponding columns, while \opt{degree=1} connects only degree 1.
+\begin{verbatim}
+\[
+\begin{derhamdiagram}[dimension=2]
+  \derhamconnect[from=physical,to=reference,operator=F^*]
+  \derhamconnect[from=reference,to=discrete,
+                 operator=\pi_h]
+  \derhamrow[name=physical,kind=continuous]
+  \derhamrow[name=reference,kind=reference]
+  \derhamrow[name=discrete,kind=discrete]
+\end{derhamdiagram}
+\]
+\end{verbatim}
+\[\begin{derhamdiagram}[dimension=2]
+  \derhamconnect[from=physical,to=reference,operator=F^*]
+  \derhamconnect[from=reference,to=discrete,operator=\pi_h]
+  \derhamrow[name=physical,kind=continuous]
+  \derhamrow[name=reference,kind=reference]
+  \derhamrow[name=discrete,kind=discrete]
+\end{derhamdiagram}\]
+Each \verb|\derhamrow| accepts \opt{name}, \opt{kind}, \opt{spaces}, and \opt{operators}. Row kinds include \opt{continuous}, \opt{discrete}, \opt{reference}, \opt{coefficients}, \opt{conforming}, \opt{dual}, and \opt{broken}. Row lists have $n+1$ spaces and $n$ operators.
+
+Each \verb|\derhamconnect| accepts \opt{from}, \opt{to}, \opt{operator}, and optional \opt{degree}. The operator is repeated for an all-degree connection. For distinct labels by degree, declare individual connections.
+
+\Needspace{.36\textheight}
+\section{Primal, dual, and broken rows}
+\verb|\derhamdual| is an algebraic dual layout: $V_h^k$ has rightward $d_h^k$ arrows, $(V_h^k)^*$ has leftward $\widetilde d_h^k$ arrows, and the vertical labels are $M_k$. These are editable labels. The weak arrows and mass maps must be defined consistently by the author; this diagram does not assert an adjoint identity.
+\begin{verbatim}
+\[\derhamdual[dimension=2]\]
+\end{verbatim}
+\[\derhamdual[dimension=2]\]
+Use \opt{dual-spaces}, \opt{dual-operators}, \opt{duality}, and \opt{maps} to adopt a specific indexing and mass-map convention. The dual row can also be used in a named diagram.
+
+\verb|\derhambroken| places conforming $V_h^{k,c}$ spaces above broken $V_h^k$ spaces and draws $P_h^k$ upward. The broken row uses patchwise derivative labels $d_{\mathrm{pw}}^k$; the conforming row uses $d_h^{k,c}$. These are labels for the structural relation in the cited paper. In an actual broken FEEC construction, specify the precise patchwise derivatives and projected strong operators.
+\begin{verbatim}
+\[\derhambroken[dimension=2]\]
+\end{verbatim}
+\[\derhambroken[dimension=2]\]
+Set \opt{broken-spaces}, \opt{broken-operators}, \opt{conforming-projection}, or \opt{maps} for the conventions in your paper. The broken and dual layouts follow the structural distinction between strong and weak sequences discussed by Güçlü, Campos Pinto, and Hadjout; they are intentionally generic rather than copies of a particular published diagram.
+
+\section{Configuration reference}
+\verb|\derhamsetup{...}| sets defaults in the current TeX scope. Options on a diagram command take priority and are local to that command.
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.42\linewidth}>{\raggedright\arraybackslash}p{.5\linewidth}@{}}\toprule
+Key & Meaning and default \\ \midrule\endhead
+\opt{dimension} & Integer 1, 2, or 3; default 3.\\
+\opt{notation} & \opt{generic}, \opt{forms}, or \opt{vector}; default \opt{generic}.\\
+\opt{spaces} & \opt{generic} or \opt{sobolev}; default \opt{generic}.\\
+\opt{discrete} & Boolean, default \opt{false}; applies to \verb|\derhamcomplex|.\\
+\opt{from}, \opt{to} & Inclusive degree range; defaults 0 and the dimension.\\
+\opt{zero-start}, \opt{zero-end} & Boolean visual endpoints; default \opt{false}.\\
+\opt{custom-spaces}, \opt{custom-discrete-spaces} & Comma lists of $n+1$ math labels.\\
+\opt{operators}, \opt{discrete-operators} & Comma lists of $n$ math labels.\\
+\opt{maps} & Comma list of $n+1$ vertical map labels.\\
+\opt{projection} & Base symbol for indexed vertical labels; default $\pi_h$.\\
+\opt{vertical-direction} & \opt{down} or \opt{up}; default \opt{down}.\\
+\opt{row-sep}, \opt{column-sep} & \pkg{tikz-cd} separation values; default \opt{large}.\\
+\opt{space-\emph{k}}, \opt{discrete-space-\emph{k}} & Override the degree-$k$ space.\\
+\opt{operator-\emph{k}}, \opt{discrete-operator-\emph{k}} & Override the arrow from degree $k$ to $k+1$.\\
+\opt{map-\emph{k}}, \opt{map-direction-\emph{k}} & Override a vertical map label or its direction.\\
+\opt{geometry-direction}, \opt{pullback} & Geometric map orientation and pullback label for \verb|\derhammapped|.\\
+\opt{reference-spaces}, \opt{reference-operators} & Full lists for the reference row.\\
+\opt{coefficient-spaces}, \opt{coefficient-operators}, \opt{dof} & Coefficient row and degree-of-freedom labels.\\
+\opt{dual-spaces}, \opt{dual-operators}, \opt{duality} & Algebraic dual row and vertical labels.\\
+\opt{broken-spaces}, \opt{broken-operators}, \opt{conforming-projection} & Broken row and conforming projection labels.\\
+\bottomrule
+\end{longtable}
+For example, \verb|\derhamsetup{dimension=2,column-sep=huge}| changes later diagrams in the current group. Standard \pkg{tikz-cd} values such as \opt{small}, \opt{normal}, \opt{large}, and \opt{huge} are accepted for spacing.
+
+\section{Published-notation regression example}
+The following labels follow the conforming FEEC projection relation in \href{https://link.springer.com/article/10.1007/s10915-023-02351-x}{Güçlü, Campos Pinto, and Hadjout (2023), Eq.~(10)}. The corresponding source is \texttt{examples/plasma-feec.tex}. Commutativity is a hypothesis on the chosen projections, not a property checked by \pkg{derham}.
+\begin{verbatim}
+\[\derhamcommuting[
+  dimension=3,
+  custom-discrete-spaces={V_h^{0,c},V_h^{1,c},
+                          V_h^{2,c},V_h^{3,c}},
+  operators={\operatorname{grad},\operatorname{curl},
+             \operatorname{div}},
+  discrete-operators={\operatorname{grad}_h^c,
+                      \operatorname{curl}_h^c,
+                      \operatorname{div}_h^c},
+  maps={\Pi_h^{0,c},\Pi_h^{1,c},\Pi_h^{2,c},\Pi_h^{3,c}}
+]\]
+\end{verbatim}
+\[\derhamcommuting[dimension=3,custom-discrete-spaces={V_h^{0,c},V_h^{1,c},V_h^{2,c},V_h^{3,c}},operators={\operatorname{grad},\operatorname{curl},\operatorname{div}},discrete-operators={\operatorname{grad}_h^c,\operatorname{curl}_h^c,\operatorname{div}_h^c},maps={\Pi_h^{0,c},\Pi_h^{1,c},\Pi_h^{2,c},\Pi_h^{3,c}}]\]
+
+\section{Limits and roadmap}
+Version 0.2 supports dimensions 1--3. Named rows may be stacked, but connections link corresponding degrees only. Arbitrary finite dimensions, separate column maps, advanced styling, and specific mapped multipatch presets remain future work. No externalization or automatic sizing is provided. A wide diagram may need a smaller \opt{column-sep}, a landscape page, or a paper-specific layout.
+
+The mapped pullback convention follows the naturality of exterior differentiation described in \href{https://www-users.cse.umn.edu/~arnold/feec-cbms/feec.pdf}{Arnold's FEEC notes}. The distinction between conforming and broken spaces, primal and dual sequences, and patchwise versus projected operators follows \href{https://link.springer.com/article/10.1007/s10915-023-02351-x}{Güçlü, Campos Pinto, and Hadjout, Journal of Scientific Computing (2023)}. These sources motivate the examples; users must select operators and spaces for their own setting.
+
+\end{document}

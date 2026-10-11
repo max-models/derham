@@ -1,0 +1,26 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{derham}
+\begin{document}
+\START
+\TYPE{mapped pullback directions}
+\[\derhammapped[dimension=2,notation=forms,spaces=sobolev]\]
+\[\derhammapped[dimension=2,geometry-direction=physical-to-reference,pullback=G^*]\]
+\TYPE{coefficient, dual, and broken families}
+\[\derhamcoefficients[dimension=2]\]
+\[\derhamcoefficients[dimension=2,coefficient-spaces={C^0,C^1,C^2},coefficient-operators={E_0,E_1},maps={Q_0,Q_1,Q_2}]\]
+\[\derhamdual[dimension=2]\]
+\[\derhamdual[dimension=1,zero-start=true,zero-end=true]\]
+\[\derhambroken[dimension=2]\]
+\TYPE{published conforming FEEC projection notation}
+\[\derhamcommuting[dimension=3,custom-spaces={V^0,V^1,V^2,V^3},custom-discrete-spaces={V_h^{0,c},V_h^{1,c},V_h^{2,c},V_h^{3,c}},operators={\operatorname{grad},\operatorname{curl},\operatorname{div}},discrete-operators={\operatorname{grad}_h^c,\operatorname{curl}_h^c,\operatorname{div}_h^c},maps={\Pi_h^{0,c},\Pi_h^{1,c},\Pi_h^{2,c},\Pi_h^{3,c}}]\]
+\TYPE{multilevel connections before rows and individual degree}
+\[\begin{derhamdiagram}[dimension=2]
+  \derhamconnect[from=physical,to=reference,operator=F^*]
+  \derhamconnect[from=reference,to=discrete,operator=\pi_h,degree=1]
+  \derhamrow[name=physical,kind=continuous]
+  \derhamrow[name=reference,kind=reference]
+  \derhamrow[name=discrete,kind=discrete]
+\end{derhamdiagram}\]
+\END
+\end{document}

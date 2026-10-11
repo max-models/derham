@@ -1,0 +1,9 @@
+*.aux
+*.log
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+build/
+tmp/
+examples/*.pdf

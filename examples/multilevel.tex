@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage[a4paper,margin=22mm]{geometry}
+\usepackage{derham}
+\begin{document}
+\section*{Compositional diagram}
+\[
+\begin{derhamdiagram}[dimension=2,notation=forms]
+  \derhamconnect[from=physical,to=reference,operator=F^*]
+  \derhamconnect[from=reference,to=discrete,operator=\pi_h]
+  \derhamrow[name=physical,kind=continuous]
+  \derhamrow[name=reference,kind=reference]
+  \derhamrow[name=discrete,kind=discrete]
+\end{derhamdiagram}
+\]
+\end{document}

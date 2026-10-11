@@ -1,0 +1,33 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{derham}
+\begin{document}
+\START
+\TYPE{invalid dimension}
+\[\derhamcomplex[dimension=4]\]
+\TYPE{invalid range}
+\[\derhamcomplex[from=2,to=1]\]
+\TYPE{invalid list length}
+\[\derhamcomplex[dimension=2,custom-spaces={A,B}]\]
+\TYPE{invalid override index}
+\[\derhamcomplex[dimension=1,operator-2=Q]\]
+\TYPE{unknown key}
+\[\derhamcomplex[nonsense=true]\]
+\TYPE{duplicate row}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=a]
+  \derhamrow[name=a]
+\end{derhamdiagram}\]
+\TYPE{missing row reference}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=a]
+  \derhamconnect[from=a,to=missing]
+\end{derhamdiagram}\]
+\TYPE{invalid connection degree}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=a]
+  \derhamrow[name=b]
+  \derhamconnect[from=a,to=b,degree=3]
+\end{derhamdiagram}\]
+\END
+\end{document}

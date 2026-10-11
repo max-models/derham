@@ -1,0 +1,74 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+invalid dimension
+LaTeX Font Info:    Trying to load font information for U+msa on input line ....
+LaTeX Font Info:    Trying to load font information for U+msb on input line ....
+! Package derham Error: Dimension must be 1, 2, or 3; got '4'.
+Type <return> to continue.
+ ...                                              
+l. ...\[\derhamcomplex[dimension=4]
+                                 \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+invalid range
+! Package derham Error: Degree range 2--1 must satisfy 0 <= from < to <= dimension.
+Type <return> to continue.
+ ...                                              
+l. ...\[\derhamcomplex[from=2,to=1]
+                                 \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+invalid list length
+! Package derham Error: Option 'custom-spaces' needs 3 items; got 2.
+Type <return> to continue.
+ ...                                              
+l. ......amcomplex[dimension=2,custom-spaces={A,B}]
+                                                  \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+invalid override index
+! Package derham Error: Index 2 for 'operator' is outside the selected complex.
+Type <return> to continue.
+ ...                                              
+l. ...\[\derhamcomplex[dimension=1,operator-2=Q]
+                                               \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+unknown key
+! LaTeX Error: The key 'derham/nonsense' is unknown and is being ignored.
+For immediate help type H <return>.
+ ...                                              
+l. ...\[\derhamcomplex[nonsense=true]
+                                    \]
+The module 'derham' does not have a key called 'derham/nonsense'.
+Check that you have spelled the key name correctly.
+duplicate row
+! Package derham Error: Row 'a' is already defined.
+Type <return> to continue.
+ ...                                              
+l. ...  \derhamrow[name=a]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+missing row reference
+! Package derham Error: Connection references unknown row 'missing'.
+Type <return> to continue.
+ ...                                              
+l. ...\end{derhamdiagram}
+                        \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+invalid connection degree
+! Package derham Error: Connection degree 3 must lie between from and to.
+Type <return> to continue.
+ ...                                              
+l. ...\end{derhamdiagram}
+                        \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.

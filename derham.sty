@@ -1,0 +1,720 @@
+%% derham -- de Rham complexes and FEEC commuting diagrams
+%% Copyright (C) 2026 derham contributors
+%% Released under the LaTeX Project Public License v1.3c or later.
+\NeedsTeXFormat{LaTeX2e}[2020-10-01]
+\ProvidesExplPackage{derham}{2026-10-11}{0.2.0}{De Rham and FEEC diagrams}
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{tikz-cd}
+\ExplSyntaxOn
+
+\msg_new:nnn {derham}{invalid-dimension}{Dimension~must~be~1,~2,~or~3;~got~'#1'.}
+\msg_new:nnn {derham}{invalid-range}{Degree~range~#1--#2~must~satisfy~0~<=~from~<~to~<=~dimension.}
+\msg_new:nnn {derham}{wrong-length}{Option~'#1'~needs~#2~items;~got~#3.}
+\msg_new:nnn {derham}{bad-index}{Index~#1~for~'#2'~is~outside~the~selected~complex.}
+\msg_new:nnn {derham}{duplicate-row}{Row~'#1'~is~already~defined.}
+\msg_new:nnn {derham}{missing-row}{Connection~references~unknown~row~'#1'.}
+\msg_new:nnn {derham}{same-row}{A~connection~must~link~two~different~rows.}
+\msg_new:nnn {derham}{outside-diagram}{Use~'#1'~inside~a~derhamdiagram~environment.}
+\msg_new:nnn {derham}{no-rows}{A~derhamdiagram~needs~at~least~one~row.}
+\msg_new:nnn {derham}{invalid-degree}{Connection~degree~#1~must~lie~between~from~and~to.}
+\msg_new:nnn {derham}{missing-name}{Every~diagram~row~needs~a~nonempty~name.}
+
+\int_new:N \l__derham_dimension_int
+\int_new:N \l__derham_from_int
+\int_new:N \l__derham_to_int
+\tl_new:N \l__derham_notation_tl
+\tl_new:N \l__derham_spaces_tl
+\tl_new:N \l__derham_row_sep_tl
+\tl_new:N \l__derham_column_sep_tl
+\tl_new:N \l__derham_projection_tl
+\tl_new:N \l__derham_vertical_direction_tl
+\bool_new:N \l__derham_discrete_bool
+\bool_new:N \l__derham_zero_start_bool
+\bool_new:N \l__derham_zero_end_bool
+\clist_new:N \l__derham_custom_spaces_clist
+\clist_new:N \l__derham_custom_discrete_spaces_clist
+\clist_new:N \l__derham_operators_clist
+\clist_new:N \l__derham_discrete_operators_clist
+\clist_new:N \l__derham_maps_clist
+\prop_new:N \l__derham_space_override_prop
+\prop_new:N \l__derham_discrete_space_override_prop
+\prop_new:N \l__derham_operator_override_prop
+\prop_new:N \l__derham_discrete_operator_override_prop
+\prop_new:N \l__derham_map_override_prop
+\prop_new:N \l__derham_map_direction_override_prop
+\tl_new:N \l__derham_body_tl
+\tl_new:N \l__derham_label_tl
+\tl_new:N \l__derham_direction_tl
+\bool_new:N \l__derham_valid_bool
+\seq_new:N \l__derham_rows_seq
+\seq_new:N \l__derham_connections_seq
+\prop_new:N \l__derham_row_index_prop
+\prop_new:N \l__derham_row_space_prop
+\prop_new:N \l__derham_row_operator_prop
+\prop_new:N \l__derham_row_direction_prop
+\prop_new:N \l__derham_connection_prop
+\int_new:N \l__derham_connection_int
+\bool_new:N \l__derham_diagram_active_bool
+\tl_new:N \l__derham_row_name_tl
+\tl_new:N \l__derham_row_kind_tl
+\clist_new:N \l__derham_row_spaces_clist
+\clist_new:N \l__derham_row_operators_clist
+\tl_new:N \l__derham_connect_from_tl
+\tl_new:N \l__derham_connect_to_tl
+\tl_new:N \l__derham_connect_operator_tl
+\int_new:N \l__derham_connect_degree_int
+\tl_new:N \l__derham_key_tl
+\tl_new:N \l__derham_temp_tl
+\tl_new:N \l__derham_geometry_direction_tl
+\tl_new:N \l__derham_pullback_tl
+\clist_new:N \l__derham_reference_spaces_clist
+\clist_new:N \l__derham_reference_operators_clist
+\clist_new:N \l__derham_coefficient_spaces_clist
+\clist_new:N \l__derham_coefficient_operators_clist
+\clist_new:N \l__derham_dual_spaces_clist
+\clist_new:N \l__derham_dual_operators_clist
+\clist_new:N \l__derham_broken_spaces_clist
+\clist_new:N \l__derham_broken_operators_clist
+\tl_new:N \l__derham_dof_tl
+\tl_new:N \l__derham_duality_tl
+\tl_new:N \l__derham_conforming_projection_tl
+\tl_set:Nn \l__derham_geometry_direction_tl {reference-to-physical}
+\tl_set:Nn \l__derham_pullback_tl {F^*}
+\tl_set:Nn \l__derham_dof_tl {\operatorname{DoF}}
+\tl_set:Nn \l__derham_duality_tl {M}
+\tl_set:Nn \l__derham_conforming_projection_tl {P_h}
+
+\int_set:Nn \l__derham_dimension_int {3}
+\int_set:Nn \l__derham_from_int {0}
+\int_set:Nn \l__derham_to_int {-1}
+\tl_set:Nn \l__derham_notation_tl {generic}
+\tl_set:Nn \l__derham_spaces_tl {generic}
+\tl_set:Nn \l__derham_row_sep_tl {large}
+\tl_set:Nn \l__derham_column_sep_tl {large}
+\tl_set:Nn \l__derham_projection_tl {\pi _h}
+\tl_set:Nn \l__derham_vertical_direction_tl {down}
+
+\keys_define:nn {derham}
+  {
+    dimension .int_set:N = \l__derham_dimension_int,
+    from .int_set:N = \l__derham_from_int,
+    to .int_set:N = \l__derham_to_int,
+    notation .choice:,
+    notation / generic .code:n = {\tl_set:Nn \l__derham_notation_tl {generic}},
+    notation / forms .code:n = {\tl_set:Nn \l__derham_notation_tl {forms}},
+    notation / vector .code:n = {\tl_set:Nn \l__derham_notation_tl {vector}},
+    spaces .choice:,
+    spaces / generic .code:n = {\tl_set:Nn \l__derham_spaces_tl {generic}},
+    spaces / sobolev .code:n = {\tl_set:Nn \l__derham_spaces_tl {sobolev}},
+    custom-spaces .clist_set:N = \l__derham_custom_spaces_clist,
+    custom-discrete-spaces .clist_set:N = \l__derham_custom_discrete_spaces_clist,
+    operators .clist_set:N = \l__derham_operators_clist,
+    discrete-operators .clist_set:N = \l__derham_discrete_operators_clist,
+    maps .clist_set:N = \l__derham_maps_clist,
+    projection .tl_set:N = \l__derham_projection_tl,
+    discrete .bool_set:N = \l__derham_discrete_bool,
+    zero-start .bool_set:N = \l__derham_zero_start_bool,
+    zero-end .bool_set:N = \l__derham_zero_end_bool,
+    vertical-direction .choice:,
+    vertical-direction / down .code:n = {\tl_set:Nn \l__derham_vertical_direction_tl {down}},
+    vertical-direction / up .code:n = {\tl_set:Nn \l__derham_vertical_direction_tl {up}},
+    row-sep .tl_set:N = \l__derham_row_sep_tl,
+    column-sep .tl_set:N = \l__derham_column_sep_tl,
+    geometry-direction .choice:,
+    geometry-direction / reference-to-physical .code:n = {\tl_set:Nn \l__derham_geometry_direction_tl {reference-to-physical}},
+    geometry-direction / physical-to-reference .code:n = {\tl_set:Nn \l__derham_geometry_direction_tl {physical-to-reference}},
+    pullback .tl_set:N = \l__derham_pullback_tl,
+    reference-spaces .clist_set:N = \l__derham_reference_spaces_clist,
+    reference-operators .clist_set:N = \l__derham_reference_operators_clist,
+    coefficient-spaces .clist_set:N = \l__derham_coefficient_spaces_clist,
+    coefficient-operators .clist_set:N = \l__derham_coefficient_operators_clist,
+    dof .tl_set:N = \l__derham_dof_tl,
+    dual-spaces .clist_set:N = \l__derham_dual_spaces_clist,
+    dual-operators .clist_set:N = \l__derham_dual_operators_clist,
+    broken-spaces .clist_set:N = \l__derham_broken_spaces_clist,
+    broken-operators .clist_set:N = \l__derham_broken_operators_clist,
+    duality .tl_set:N = \l__derham_duality_tl,
+    conforming-projection .tl_set:N = \l__derham_conforming_projection_tl
+  }
+\int_step_inline:nnnn {0}{1}{3}
+  {
+    \keys_define:nn {derham}
+      {
+        space-#1 .code:n = {\prop_put:Nnn \l__derham_space_override_prop {#1}{##1}},
+        discrete-space-#1 .code:n = {\prop_put:Nnn \l__derham_discrete_space_override_prop {#1}{##1}},
+        operator-#1 .code:n = {\prop_put:Nnn \l__derham_operator_override_prop {#1}{##1}},
+        discrete-operator-#1 .code:n = {\prop_put:Nnn \l__derham_discrete_operator_override_prop {#1}{##1}},
+        map-#1 .code:n = {\prop_put:Nnn \l__derham_map_override_prop {#1}{##1}},
+        map-direction-#1 .choice:,
+        map-direction-#1 / down .code:n = {\prop_put:Nnn \l__derham_map_direction_override_prop {#1}{down}},
+        map-direction-#1 / up .code:n = {\prop_put:Nnn \l__derham_map_direction_override_prop {#1}{up}}
+      }
+  }
+
+\NewDocumentCommand \derhamsetup {m} {\keys_set:nn {derham}{#1}}
+
+\cs_new_protected:Npn \__derham_check_list:Nnn #1#2#3
+  {
+    \clist_if_empty:NF #1
+      {
+        \int_compare:nNnF {\clist_count:N #1} = {#3}
+          {
+            \msg_error:nnxxx {derham}{wrong-length}{#2}{\int_eval:n {#3}}{\int_eval:n {\clist_count:N #1}}
+            \bool_set_false:N \l__derham_valid_bool
+          }
+      }
+  }
+\cs_new_protected:Npn \__derham_check_indices:Nnn #1#2#3
+  {
+    \prop_map_inline:Nn #1
+      {
+        \int_compare:nNnT {##1} > {#3}
+          {\msg_error:nnnn {derham}{bad-index}{##1}{#2}\bool_set_false:N \l__derham_valid_bool}
+      }
+  }
+\cs_new_protected:Npn \__derham_validate:
+  {
+    \bool_set_true:N \l__derham_valid_bool
+    \int_compare:nNnF {\l__derham_dimension_int} > {0}
+      {\msg_error:nnx {derham}{invalid-dimension}{\int_use:N \l__derham_dimension_int}\bool_set_false:N \l__derham_valid_bool}
+    \int_compare:nNnF {\l__derham_dimension_int} < {4}
+      {\msg_error:nnx {derham}{invalid-dimension}{\int_use:N \l__derham_dimension_int}\bool_set_false:N \l__derham_valid_bool}
+    \int_compare:nNnT {\l__derham_to_int} = {-1}
+      {\int_set_eq:NN \l__derham_to_int \l__derham_dimension_int}
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \bool_if:nF
+          {\int_compare_p:n {\l__derham_from_int >= 0}
+           && \int_compare_p:n {\l__derham_from_int < \l__derham_to_int}
+           && \int_compare_p:n {\l__derham_to_int <= \l__derham_dimension_int}}
+          {
+            \msg_error:nnxx {derham}{invalid-range}
+              {\int_use:N \l__derham_from_int}{\int_use:N \l__derham_to_int}
+            \bool_set_false:N \l__derham_valid_bool
+          }
+        \__derham_check_list:Nnn \l__derham_custom_spaces_clist {custom-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_custom_discrete_spaces_clist {custom-discrete-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_operators_clist {operators} {\l__derham_dimension_int}
+        \__derham_check_list:Nnn \l__derham_discrete_operators_clist {discrete-operators} {\l__derham_dimension_int}
+        \__derham_check_list:Nnn \l__derham_maps_clist {maps} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_reference_spaces_clist {reference-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_reference_operators_clist {reference-operators} {\l__derham_dimension_int}
+        \__derham_check_list:Nnn \l__derham_coefficient_spaces_clist {coefficient-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_coefficient_operators_clist {coefficient-operators} {\l__derham_dimension_int}
+        \__derham_check_list:Nnn \l__derham_dual_spaces_clist {dual-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_dual_operators_clist {dual-operators} {\l__derham_dimension_int}
+        \__derham_check_list:Nnn \l__derham_broken_spaces_clist {broken-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn \l__derham_broken_operators_clist {broken-operators} {\l__derham_dimension_int}
+        \__derham_check_indices:Nnn \l__derham_space_override_prop {space} {\l__derham_dimension_int}
+        \__derham_check_indices:Nnn \l__derham_discrete_space_override_prop {discrete-space} {\l__derham_dimension_int}
+        \__derham_check_indices:Nnn \l__derham_operator_override_prop {operator} {\l__derham_dimension_int-1}
+        \__derham_check_indices:Nnn \l__derham_discrete_operator_override_prop {discrete-operator} {\l__derham_dimension_int-1}
+        \__derham_check_indices:Nnn \l__derham_map_override_prop {map} {\l__derham_dimension_int}
+        \__derham_check_indices:Nnn \l__derham_map_direction_override_prop {map-direction} {\l__derham_dimension_int}
+      }
+  }
+
+% The renderer receives each cell as space + outgoing arrows. All labels are
+% inserted unexpanded; tikz-cd owns spacing and arrow placement.
+\cs_new_protected:Npn \__derham_space:nnN #1#2#3
+  {
+    \tl_clear:N #3
+    \str_if_eq:nnTF {#1}{bottom}
+      {
+        \prop_get:NnNTF \l__derham_discrete_space_override_prop {#2} #3 {}
+          {
+            \clist_if_empty:NTF \l__derham_custom_discrete_spaces_clist
+              {\tl_set:Nn #3 {V_h^{#2}}}
+              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_custom_discrete_spaces_clist {\int_eval:n {#2+1}}}}}
+          }
+      }
+      {
+        \prop_get:NnNTF \l__derham_space_override_prop {#2} #3 {}
+          {
+            \clist_if_empty:NTF \l__derham_custom_spaces_clist
+              {
+                \str_if_eq:VnTF \l__derham_spaces_tl {sobolev}
+                  {
+                    \str_if_eq:VnTF \l__derham_notation_tl {vector}
+                      {\__derham_vector_space:nN {#2} #3}
+                      {\tl_set:Nn #3 {H\Lambda^{#2}(\Omega)}}
+                  }
+                  {\tl_set:Nn #3 {V^{#2}}}
+              }
+              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_custom_spaces_clist {\int_eval:n {#2+1}}}}}
+          }
+      }
+  }
+\cs_new_protected:Npn \__derham_vector_space:nN #1#2
+  {
+    \int_case:nnF {\l__derham_dimension_int}
+      {
+        {1}{\int_compare:nNnTF {#1} = {0} {\tl_set:Nn #2 {H^1(\Omega)}} {\tl_set:Nn #2 {L^2(\Omega)}}}
+        {2}{\int_case:nn {#1} {{0}{\tl_set:Nn #2 {H^1(\Omega)}}{1}{\tl_set:Nn #2 {H(\operatorname{curl};\Omega)}}{2}{\tl_set:Nn #2 {L^2(\Omega)}}}}
+        {3}{\int_case:nn {#1} {{0}{\tl_set:Nn #2 {H^1(\Omega)}}{1}{\tl_set:Nn #2 {H(\operatorname{curl};\Omega)}}{2}{\tl_set:Nn #2 {H(\operatorname{div};\Omega)}}{3}{\tl_set:Nn #2 {L^2(\Omega)}}}}
+      }{}
+  }
+\cs_new_protected:Npn \__derham_operator:nnN #1#2#3
+  {
+    \tl_clear:N #3
+    \str_if_eq:nnTF {#1}{bottom}
+      {
+        \prop_get:NnNTF \l__derham_discrete_operator_override_prop {#2} #3 {}
+          {
+            \clist_if_empty:NTF \l__derham_discrete_operators_clist
+              {\tl_set:Nn #3 {d_h^{#2}}}
+              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_discrete_operators_clist {\int_eval:n {#2+1}}}}}
+          }
+      }
+      {
+        \prop_get:NnNTF \l__derham_operator_override_prop {#2} #3 {}
+          {
+            \clist_if_empty:NTF \l__derham_operators_clist
+              {
+                \str_if_eq:VnTF \l__derham_notation_tl {vector}
+                  {\__derham_vector_operator:nN {#2} #3}
+                  {\tl_set:Nn #3 {d^{#2}}}
+              }
+              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_operators_clist {\int_eval:n {#2+1}}}}}
+          }
+      }
+  }
+\cs_new_protected:Npn \__derham_vector_operator:nN #1#2
+  {
+    \int_case:nnF {\l__derham_dimension_int}
+      {
+        {1}{\tl_set:Nn #2 {\frac{\mathrm d}{\mathrm dx}}}
+        {2}{\int_compare:nNnTF {#1} = {0} {\tl_set:Nn #2 {\operatorname{grad}}} {\tl_set:Nn #2 {\operatorname{curl}}}}
+        {3}{\int_case:nn {#1} {{0}{\tl_set:Nn #2 {\operatorname{grad}}}{1}{\tl_set:Nn #2 {\operatorname{curl}}}{2}{\tl_set:Nn #2 {\operatorname{div}}}}}
+      }{}
+  }
+\cs_new_protected:Npn \__derham_map:nN #1#2
+  {
+    \prop_get:NnNTF \l__derham_map_override_prop {#1} #2 {}
+      {
+        \clist_if_empty:NTF \l__derham_maps_clist
+          {\tl_set:Nx #2 {\exp_not:V \l__derham_projection_tl ^{#1}}}
+          {\tl_set:Nx #2 {\exp_not:o {\clist_item:Nn \l__derham_maps_clist {\int_eval:n {#1+1}}}}}
+      }
+  }
+\cs_generate_variant:Nn \prop_put:Nnn {NVn,NVV,Nnx}
+\cs_generate_variant:Nn \prop_get:NnN {NVN}
+\cs_generate_variant:Nn \prop_if_in:NnTF {NVTF}
+\cs_generate_variant:Nn \prop_if_in:NnF {NVF}
+
+\cs_new_protected:Npn \__derham_engine_clear:
+  {
+    \seq_clear:N \l__derham_rows_seq
+    \seq_clear:N \l__derham_connections_seq
+    \prop_clear:N \l__derham_row_index_prop
+    \prop_clear:N \l__derham_row_space_prop
+    \prop_clear:N \l__derham_row_operator_prop
+    \prop_clear:N \l__derham_row_direction_prop
+    \prop_clear:N \l__derham_connection_prop
+    \int_zero:N \l__derham_connection_int
+  }
+\cs_new_protected:Npn \__derham_default_space:nnN #1#2#3
+  {
+    \str_case:nnF {#1}
+      {
+        {top}{\__derham_space:nnN {top}{#2} #3}
+        {bottom}{\__derham_space:nnN {bottom}{#2} #3}
+        {reference}{
+          \str_if_eq:VnTF \l__derham_spaces_tl {sobolev}
+            {\tl_set:Nn #3 {H\Lambda^{#2}(\widehat{\Omega})}}
+            {\tl_set:Nn #3 {\widehat{V}^{#2}}}
+        }
+        {coefficients}{\tl_set:Nn #3 {\mathbb{R}^{N_{#2}}}}
+        {dual}{\tl_set:Nn #3 {(V_h^{#2})^*}}
+        {conforming}{\tl_set:Nn #3 {V_h^{#2,c}}}
+        {broken}{\tl_set:Nn #3 {V_h^{#2}}}
+      }
+      {\tl_set:Nn #3 {V^{#2}}}
+  }
+\cs_new_protected:Npn \__derham_default_operator:nnN #1#2#3
+  {
+    \str_case:nnF {#1}
+      {
+        {top}{\__derham_operator:nnN {top}{#2} #3}
+        {bottom}{\__derham_operator:nnN {bottom}{#2} #3}
+        {reference}{\tl_set:Nn #3 {\widehat{d}^{#2}}}
+        {coefficients}{
+          \int_case:nnF {#2}
+            {{0}{\tl_set:Nn #3 {G}}{1}{\tl_set:Nn #3 {C}}{2}{\tl_set:Nn #3 {D}}}
+            {\tl_set:Nn #3 {D_{#2}}}
+        }
+        {dual}{\tl_set:Nn #3 {\widetilde{d}_h^{#2}}}
+        {conforming}{\tl_set:Nn #3 {d_h^{#2,c}}}
+        {broken}{\tl_set:Nn #3 {d_{\mathrm{pw}}^{#2}}}
+      }
+      {\tl_set:Nn #3 {d^{#2}}}
+  }
+\cs_new_protected:Npn \__derham_add_row:nnNN #1#2#3#4
+  {
+    \prop_if_in:NnTF \l__derham_row_index_prop {#1}
+      {\msg_error:nnn {derham}{duplicate-row}{#1}\bool_set_false:N \l__derham_valid_bool}
+      {
+        \__derham_check_list:Nnn #3 {row-spaces} {\l__derham_dimension_int+1}
+        \__derham_check_list:Nnn #4 {row-operators} {\l__derham_dimension_int}
+        \bool_if:NT \l__derham_valid_bool
+          {
+            \seq_put_right:Nn \l__derham_rows_seq {#1}
+            \prop_put:Nnx \l__derham_row_index_prop {#1}{\seq_count:N \l__derham_rows_seq}
+            \str_if_eq:nnTF {#2}{dual}
+              {\prop_put:Nnn \l__derham_row_direction_prop {#1}{left}}
+              {\prop_put:Nnn \l__derham_row_direction_prop {#1}{right}}
+            \int_step_inline:nnnn {0}{1}{\l__derham_dimension_int}
+              {
+                \clist_if_empty:NTF #3
+                  {\__derham_default_space:nnN {#2}{##1} \l__derham_label_tl}
+                  {\tl_set:Nx \l__derham_label_tl {\exp_not:o {\clist_item:Nn #3 {\int_eval:n {##1+1}}}}}
+                \tl_set:Nx \l__derham_key_tl {#1/##1}
+                \prop_put:NVV \l__derham_row_space_prop \l__derham_key_tl \l__derham_label_tl
+                \int_compare:nNnT {##1} < {\l__derham_dimension_int}
+                  {
+                    \clist_if_empty:NTF #4
+                      {\__derham_default_operator:nnN {#2}{##1} \l__derham_label_tl}
+                      {\tl_set:Nx \l__derham_label_tl {\exp_not:o {\clist_item:Nn #4 {\int_eval:n {##1+1}}}}}
+                    \prop_put:NVV \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
+                  }
+              }
+          }
+      }
+  }
+\cs_generate_variant:Nn \__derham_add_row:nnNN {VVNN}
+\cs_new_protected:Npn \__derham_add_connection:nnnN #1#2#3#4
+  {
+    \int_incr:N \l__derham_connection_int
+    \seq_put_right:Nx \l__derham_connections_seq {\int_use:N \l__derham_connection_int}
+    \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /from}
+    \prop_put:NVn \l__derham_connection_prop \l__derham_key_tl {#1}
+    \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /to}
+    \prop_put:NVn \l__derham_connection_prop \l__derham_key_tl {#2}
+    \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /degree}
+    \tl_set:Nx \l__derham_temp_tl {#3}
+    \prop_put:NVV \l__derham_connection_prop \l__derham_key_tl \l__derham_temp_tl
+    \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /label}
+    \prop_put:NVV \l__derham_connection_prop \l__derham_key_tl #4
+  }
+\cs_generate_variant:Nn \__derham_add_connection:nnnN {VVnN}
+\cs_new_protected:Npn \__derham_connection_field:nnN #1#2#3
+  {\tl_set:Nx \l__derham_key_tl {#1/#2}\prop_get:NVN \l__derham_connection_prop \l__derham_key_tl #3}
+\cs_new_protected:Npn \__derham_validate_connections:
+  {
+    \seq_if_empty:NT \l__derham_rows_seq
+      {\msg_error:nn {derham}{no-rows}\bool_set_false:N \l__derham_valid_bool}
+    \seq_map_inline:Nn \l__derham_connections_seq
+      {
+        \__derham_connection_field:nnN {##1}{from} \l__derham_connect_from_tl
+        \__derham_connection_field:nnN {##1}{to} \l__derham_connect_to_tl
+        \prop_if_in:NVF \l__derham_row_index_prop \l__derham_connect_from_tl
+          {\msg_error:nnx {derham}{missing-row}{\l__derham_connect_from_tl}\bool_set_false:N \l__derham_valid_bool}
+        \prop_if_in:NVF \l__derham_row_index_prop \l__derham_connect_to_tl
+          {\msg_error:nnx {derham}{missing-row}{\l__derham_connect_to_tl}\bool_set_false:N \l__derham_valid_bool}
+        \tl_if_eq:NNT \l__derham_connect_from_tl \l__derham_connect_to_tl
+          {\msg_error:nn {derham}{same-row}\bool_set_false:N \l__derham_valid_bool}
+        \__derham_connection_field:nnN {##1}{degree} \l__derham_temp_tl
+        \int_compare:nNnF {\l__derham_temp_tl} = {-1}
+          {
+            \bool_if:nF
+              {\int_compare_p:n {\l__derham_temp_tl >= \l__derham_from_int}
+               && \int_compare_p:n {\l__derham_temp_tl <= \l__derham_to_int}}
+              {\msg_error:nnx {derham}{invalid-degree}{\l__derham_temp_tl}\bool_set_false:N \l__derham_valid_bool}
+          }
+      }
+  }
+\cs_new_protected:Npn \__derham_put_connection:nnn #1#2#3
+  {
+    \__derham_connection_field:nnN {#3}{from} \l__derham_connect_from_tl
+    \__derham_connection_field:nnN {#3}{degree} \l__derham_temp_tl
+    \str_if_eq:eeT {\l__derham_connect_from_tl}{#1}
+      {
+        \bool_if:nT
+          {\int_compare_p:n {\l__derham_temp_tl = -1}
+           || \int_compare_p:n {\l__derham_temp_tl = #2}}
+          {
+            \__derham_connection_field:nnN {#3}{to} \l__derham_connect_to_tl
+            \prop_get:NVN \l__derham_row_index_prop \l__derham_connect_from_tl \l__derham_temp_tl
+            \prop_get:NVN \l__derham_row_index_prop \l__derham_connect_to_tl \l__derham_direction_tl
+            \int_set:Nn \l_tmpa_int {\l__derham_direction_tl-\l__derham_temp_tl}
+            \tl_clear:N \l__derham_direction_tl
+            \int_compare:nNnTF {\l_tmpa_int} > {0}
+              {\int_step_inline:nn {\l_tmpa_int}{\tl_put_right:Nn \l__derham_direction_tl {d}}}
+              {\int_step_inline:nn {-\l_tmpa_int}{\tl_put_right:Nn \l__derham_direction_tl {u}}}
+            \__derham_connection_field:nnN {#3}{label} \l__derham_label_tl
+            \tl_put_right:Nn \l__derham_body_tl {\arrow[}
+            \tl_put_right:NV \l__derham_body_tl \l__derham_direction_tl
+            \tl_put_right:Nn \l__derham_body_tl {,"}
+            \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
+            \tl_put_right:Nn \l__derham_body_tl {"]}
+          }
+      }
+  }
+\cs_new_protected:Npn \__derham_put_engine_cell:nn #1#2
+  {
+    \tl_set:Nx \l__derham_key_tl {#1/#2}
+    \prop_get:NVN \l__derham_row_space_prop \l__derham_key_tl \l__derham_label_tl
+    \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
+    \prop_get:NnN \l__derham_row_direction_prop {#1} \l__derham_direction_tl
+    \str_if_eq:VnTF \l__derham_direction_tl {left}
+      {
+        \int_compare:nNnT {#2} > {\l__derham_from_int}
+          {
+            \tl_set:Nx \l__derham_key_tl {#1/\int_eval:n {#2-1}}
+            \prop_get:NVN \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
+            \tl_put_right:Nn \l__derham_body_tl {\arrow[l,"}
+            \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
+            \tl_put_right:Nn \l__derham_body_tl {"]}
+          }
+      }
+      {
+        \int_compare:nNnT {#2} < {\l__derham_to_int}
+          {
+            \prop_get:NVN \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
+            \tl_put_right:Nn \l__derham_body_tl {\arrow[r,"}
+            \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
+            \tl_put_right:Nn \l__derham_body_tl {"]}
+          }
+      }
+    \str_if_eq:VnT \l__derham_direction_tl {left}
+      {
+        \bool_if:NT \l__derham_zero_start_bool
+          {\int_compare:nNnT {#2} = {\l__derham_from_int}
+             {\tl_put_right:Nn \l__derham_body_tl {\arrow[l]}}}
+      }
+    \seq_map_inline:Nn \l__derham_connections_seq
+      {\__derham_put_connection:nnn {#1}{#2}{##1}}
+  }
+\cs_new_protected:Npn \__derham_put_engine_row:n #1
+  {
+    \prop_get:NnN \l__derham_row_direction_prop {#1} \l__derham_direction_tl
+    \bool_if:NT \l__derham_zero_start_bool
+      {
+        \str_if_eq:VnTF \l__derham_direction_tl {left}
+          {\tl_put_right:Nn \l__derham_body_tl {0\&}}
+          {\tl_put_right:Nn \l__derham_body_tl {0\arrow[r]\&}}
+      }
+    \int_step_inline:nnnn {\l__derham_from_int}{1}{\l__derham_to_int}
+      {
+        \__derham_put_engine_cell:nn {#1}{##1}
+        \int_compare:nNnT {##1} < {\l__derham_to_int}
+          {\tl_put_right:Nn \l__derham_body_tl {\&}}
+      }
+    \prop_get:NnN \l__derham_row_direction_prop {#1} \l__derham_direction_tl
+    \bool_if:NT \l__derham_zero_end_bool
+      {
+        \str_if_eq:VnTF \l__derham_direction_tl {left}
+          {\tl_put_right:Nn \l__derham_body_tl {\&0\arrow[l]}}
+          {\tl_put_right:Nn \l__derham_body_tl {\arrow[r]\&0}}
+      }
+  }
+\cs_new_protected:Npn \__derham_typeset:n #1
+  {\begin{tikzcd}[ampersand~replacement=\&,row~sep=\l__derham_row_sep_tl,column~sep=\l__derham_column_sep_tl]#1\end{tikzcd}}
+\cs_new_protected:Npn \__derham_render_rows:
+  {
+    \__derham_validate_connections:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \tl_clear:N \l__derham_body_tl
+        \seq_map_indexed_inline:Nn \l__derham_rows_seq
+          {
+            \int_compare:nNnT {##1} > {1}{\tl_put_right:Nn \l__derham_body_tl {\\}}
+            \__derham_put_engine_row:n {##2}
+          }
+        \exp_args:NV \__derham_typeset:n \l__derham_body_tl
+      }
+  }
+
+\keys_define:nn {derham/row}
+  {
+    name .tl_set:N = \l__derham_row_name_tl,
+    kind .choice:,
+    kind / continuous .code:n = {\tl_set:Nn \l__derham_row_kind_tl {top}},
+    kind / discrete .code:n = {\tl_set:Nn \l__derham_row_kind_tl {bottom}},
+    kind / reference .code:n = {\tl_set:Nn \l__derham_row_kind_tl {reference}},
+    kind / coefficients .code:n = {\tl_set:Nn \l__derham_row_kind_tl {coefficients}},
+    kind / dual .code:n = {\tl_set:Nn \l__derham_row_kind_tl {dual}},
+    kind / broken .code:n = {\tl_set:Nn \l__derham_row_kind_tl {broken}},
+    kind / conforming .code:n = {\tl_set:Nn \l__derham_row_kind_tl {conforming}},
+    spaces .clist_set:N = \l__derham_row_spaces_clist,
+    operators .clist_set:N = \l__derham_row_operators_clist
+  }
+\keys_define:nn {derham/connect}
+  {
+    from .tl_set:N = \l__derham_connect_from_tl,
+    to .tl_set:N = \l__derham_connect_to_tl,
+    operator .tl_set:N = \l__derham_connect_operator_tl,
+    degree .int_set:N = \l__derham_connect_degree_int
+  }
+\NewDocumentEnvironment {derhamdiagram} {O{}}
+  {\group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:\bool_set_true:N \l__derham_diagram_active_bool}
+  {\bool_if:NT \l__derham_valid_bool {\__derham_render_rows:}\group_end:}
+\NewDocumentCommand \derhamrow {O{}}
+  {
+    \bool_if:NTF \l__derham_diagram_active_bool
+      {
+        \tl_clear:N \l__derham_row_name_tl
+        \tl_set:Nn \l__derham_row_kind_tl {top}
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \keys_set:nn {derham/row}{#1}
+        \tl_if_empty:VTF \l__derham_row_name_tl
+          {\msg_error:nn {derham}{missing-name}\bool_set_false:N \l__derham_valid_bool}
+          {\__derham_add_row:VVNN \l__derham_row_name_tl \l__derham_row_kind_tl \l__derham_row_spaces_clist \l__derham_row_operators_clist}
+      }
+      {\msg_error:nnn {derham}{outside-diagram}{\token_to_str:N \derhamrow}}
+  }
+\NewDocumentCommand \derhamconnect {O{}}
+  {
+    \bool_if:NTF \l__derham_diagram_active_bool
+      {
+        \tl_clear:N \l__derham_connect_from_tl
+        \tl_clear:N \l__derham_connect_to_tl
+        \tl_set:Nn \l__derham_connect_operator_tl {\pi _h}
+        \int_set:Nn \l__derham_connect_degree_int {-1}
+        \keys_set:nn {derham/connect}{#1}
+        \__derham_add_connection:VVnN \l__derham_connect_from_tl \l__derham_connect_to_tl {\int_use:N \l__derham_connect_degree_int} \l__derham_connect_operator_tl
+      }
+      {\msg_error:nnn {derham}{outside-diagram}{\token_to_str:N \derhamconnect}}
+  }
+\cs_new_protected:Npn \__derham_add_indexed_maps:nn #1#2
+  {
+    \int_step_inline:nnnn {\l__derham_from_int}{1}{\l__derham_to_int}
+      {
+        \__derham_map:nN {##1} \l__derham_label_tl
+        \prop_get:NnNTF \l__derham_map_direction_override_prop {##1} \l__derham_direction_tl {}
+          {\tl_set_eq:NN \l__derham_direction_tl \l__derham_vertical_direction_tl}
+        \str_if_eq:VnTF \l__derham_direction_tl {up}
+          {\__derham_add_connection:nnnN {#2}{#1}{##1}\l__derham_label_tl}
+          {\__derham_add_connection:nnnN {#1}{#2}{##1}\l__derham_label_tl}
+      }
+  }
+\NewDocumentCommand \derhamcomplex {O{}}
+  {
+    \group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \bool_if:NTF \l__derham_discrete_bool
+          {\__derham_add_row:nnNN {discrete}{bottom}\l__derham_row_spaces_clist\l__derham_row_operators_clist}
+          {\__derham_add_row:nnNN {continuous}{top}\l__derham_row_spaces_clist\l__derham_row_operators_clist}
+        \__derham_render_rows:
+      }
+    \group_end:
+  }
+\NewDocumentCommand \derhamcommuting {O{}}
+  {
+    \group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \__derham_add_row:nnNN {continuous}{top}\l__derham_row_spaces_clist\l__derham_row_operators_clist
+        \__derham_add_row:nnNN {discrete}{bottom}\l__derham_row_spaces_clist\l__derham_row_operators_clist
+        \__derham_add_indexed_maps:nn {continuous}{discrete}
+        \__derham_render_rows:
+      }
+    \group_end:
+  }
+\cs_new_protected:Npn \__derham_preset_map:nnN #1#2#3
+  {
+    \prop_get:NnNTF \l__derham_map_override_prop {#2} #3 {}
+      {
+        \clist_if_empty:NTF \l__derham_maps_clist
+          {
+            \str_if_eq:nnTF {#1}{mapped}
+              {\tl_set_eq:NN #3 \l__derham_pullback_tl}
+              {
+                \str_case:nnF {#1}
+                  {
+                    {dual}{\tl_set:Nx #3 {\exp_not:V \l__derham_duality_tl _{#2}}}
+                    {broken}{\tl_set:Nx #3 {\exp_not:V \l__derham_conforming_projection_tl ^{#2}}}
+                  }
+                  {\tl_set:Nx #3 {\exp_not:V \l__derham_dof_tl ^{#2}}}
+              }
+          }
+          {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_maps_clist {\int_eval:n {#2+1}}}}}
+      }
+  }
+\cs_new_protected:Npn \__derham_add_preset_maps:nnn #1#2#3
+  {
+    \int_step_inline:nnnn {\l__derham_from_int}{1}{\l__derham_to_int}
+      {
+        \__derham_preset_map:nnN {#1}{##1} \l__derham_label_tl
+        \str_if_eq:nnTF {#1}{mapped}
+          {
+            \str_if_eq:VnTF \l__derham_geometry_direction_tl {reference-to-physical}
+              {\__derham_add_connection:nnnN {#2}{#3}{##1}\l__derham_label_tl}
+              {\__derham_add_connection:nnnN {#3}{#2}{##1}\l__derham_label_tl}
+          }
+          {
+            \str_if_eq:VnTF \l__derham_vertical_direction_tl {down}
+              {\__derham_add_connection:nnnN {#2}{#3}{##1}\l__derham_label_tl}
+              {\__derham_add_connection:nnnN {#3}{#2}{##1}\l__derham_label_tl}
+          }
+      }
+  }
+\NewDocumentCommand \derhammapped {O{}}
+  {
+    \group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \__derham_add_row:nnNN {physical}{top}\l__derham_row_spaces_clist\l__derham_row_operators_clist
+        \__derham_add_row:nnNN {reference}{reference}\l__derham_reference_spaces_clist\l__derham_reference_operators_clist
+        \__derham_add_preset_maps:nnn {mapped}{physical}{reference}
+        \__derham_render_rows:
+      }
+    \group_end:
+  }
+\NewDocumentCommand \derhamcoefficients {O{}}
+  {
+    \group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \__derham_add_row:nnNN {discrete}{bottom}\l__derham_row_spaces_clist\l__derham_row_operators_clist
+        \__derham_add_row:nnNN {coefficients}{coefficients}\l__derham_coefficient_spaces_clist\l__derham_coefficient_operators_clist
+        \__derham_add_preset_maps:nnn {coefficients}{discrete}{coefficients}
+        \__derham_render_rows:
+      }
+    \group_end:
+  }
+\NewDocumentCommand \derhamdual {O{}}
+  {
+    \group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \__derham_add_row:nnNN {primal}{bottom}\l__derham_row_spaces_clist\l__derham_row_operators_clist
+        \__derham_add_row:nnNN {dual}{dual}\l__derham_dual_spaces_clist\l__derham_dual_operators_clist
+        \__derham_add_preset_maps:nnn {dual}{primal}{dual}
+        \__derham_render_rows:
+      }
+    \group_end:
+  }
+\NewDocumentCommand \derhambroken {O{}}
+  {
+    \group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:
+    \bool_if:NT \l__derham_valid_bool
+      {
+        \clist_clear:N \l__derham_row_spaces_clist
+        \clist_clear:N \l__derham_row_operators_clist
+        \__derham_add_row:nnNN {conforming}{conforming}\l__derham_row_spaces_clist\l__derham_row_operators_clist
+        \__derham_add_row:nnNN {broken}{broken}\l__derham_broken_spaces_clist\l__derham_broken_operators_clist
+        \int_step_inline:nnnn {\l__derham_from_int}{1}{\l__derham_to_int}
+          {
+            \__derham_preset_map:nnN {broken}{##1} \l__derham_label_tl
+            \__derham_add_connection:nnnN {broken}{conforming}{##1}\l__derham_label_tl
+          }
+        \__derham_render_rows:
+      }
+    \group_end:
+  }
+\ExplSyntaxOff
+\endinput
