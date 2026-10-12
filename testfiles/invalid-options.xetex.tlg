@@ -1,92 +1,12 @@
 This is a generated file for the l3build validation system.
 Don't change this file in any respect.
 invalid dimension
-LaTeX Font Info:    Trying to load font information for U+msa on input line ....
-LaTeX Font Info:    Trying to load font information for U+msb on input line ....
-! Package derham Error: Dimension must be a positive integer; got '0'.
-Type <return> to continue.
- ...                                              
-l. ...\[\derhamcomplex[dimension=0]
-                                 \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 invalid range
-! Package derham Error: Degree range 2--1 must satisfy 0 <= from < to <= dimension.
-Type <return> to continue.
- ...                                              
-l. ...\[\derhamcomplex[from=2,to=1]
-                                 \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 invalid vector dimension
-! Package derham Error: Vector notation is defined only for dimensions 1--3.
-Type <return> to continue.
- ...                                              
-l. ...\[\derhamcomplex[dimension=4,notation=vector]
-                                                  \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 invalid list length
-! Package derham Error: Option 'custom-spaces' needs 3 items; got 2.
-Type <return> to continue.
- ...                                              
-l. ......amcomplex[dimension=2,custom-spaces={A,B}]
-                                                  \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 invalid override index
-! Package derham Error: Index 2 for 'operator' is outside the selected complex.
-Type <return> to continue.
- ...                                              
-l. ...\[\derhamcomplex[dimension=1,operator-2=Q]
-                                               \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 unknown key
-! Package derham Error: Unknown option 'nonsense'.
-Type <return> to continue.
- ...                                              
-l. ...\[\derhamcomplex[nonsense=true]
-                                    \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 duplicate row
-! Package derham Error: Row 'a' is already defined.
-Type <return> to continue.
- ...                                              
-l. ...  \derhamrow[name=a]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 missing row reference
-! Package derham Error: Connection references unknown row 'missing'.
-Type <return> to continue.
- ...                                              
-l. ...\end{derhamdiagram}
-                        \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 invalid connection degree
-! Package derham Error: Connection degree 3 must lie between from and to.
-Type <return> to continue.
- ...                                              
-l. ...\end{derhamdiagram}
-                        \]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.
 incomplete targeted connection
-! Package derham Error: Set both from-degree and to-degree, or use degree for corresponding columns.
-Type <return> to continue.
- ...                                              
-l. ...  \derhamconnect[from=a,to=b,from-degree=0]
-LaTeX does not know anything more about this error, sorry.
-Try typing <return> to proceed.
-If that doesn't work, type X <return> to quit.

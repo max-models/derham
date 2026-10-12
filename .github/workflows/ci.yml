@@ -9,6 +9,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-pictures texlive-luatex texlive-xetex texlive-fonts-recommended texlive-extra-utils
       - name: Regression tests
         run: l3build check
+      - name: Invalid-input diagnostics
+        run: python3 scripts/check_invalid_options.py
       - name: Check CTAN archive
         run: l3build ctan
       - name: Compile manual

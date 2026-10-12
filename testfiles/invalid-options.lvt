@@ -4,38 +4,58 @@
 \begin{document}
 \START
 \TYPE{invalid dimension}
+\OMIT
 \[\derhamcomplex[dimension=0]\]
+\TIMO
 \TYPE{invalid range}
+\OMIT
 \[\derhamcomplex[from=2,to=1]\]
+\TIMO
 \TYPE{invalid vector dimension}
+\OMIT
 \[\derhamcomplex[dimension=4,notation=vector]\]
+\TIMO
 \TYPE{invalid list length}
+\OMIT
 \[\derhamcomplex[dimension=2,custom-spaces={A,B}]\]
+\TIMO
 \TYPE{invalid override index}
+\OMIT
 \[\derhamcomplex[dimension=1,operator-2=Q]\]
+\TIMO
 \TYPE{unknown key}
+\OMIT
 \[\derhamcomplex[nonsense=true]\]
+\TIMO
 \TYPE{duplicate row}
+\OMIT
 \[\begin{derhamdiagram}[dimension=1]
   \derhamrow[name=a]
   \derhamrow[name=a]
 \end{derhamdiagram}\]
+\TIMO
 \TYPE{missing row reference}
+\OMIT
 \[\begin{derhamdiagram}[dimension=1]
   \derhamrow[name=a]
   \derhamconnect[from=a,to=missing]
 \end{derhamdiagram}\]
+\TIMO
 \TYPE{invalid connection degree}
+\OMIT
 \[\begin{derhamdiagram}[dimension=1]
   \derhamrow[name=a]
   \derhamrow[name=b]
   \derhamconnect[from=a,to=b,degree=3]
 \end{derhamdiagram}\]
+\TIMO
 \TYPE{incomplete targeted connection}
+\OMIT
 \[\begin{derhamdiagram}[dimension=1]
   \derhamrow[name=a]
   \derhamrow[name=b]
   \derhamconnect[from=a,to=b,from-degree=0]
 \end{derhamdiagram}\]
+\TIMO
 \END
 \end{document}
