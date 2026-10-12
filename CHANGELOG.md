@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 — 2026-10-12
+
+- Allow cross-degree connections between named diagram rows.
+- Support any positive dimension with generic or differential-form labels and dynamic indexed overrides.
+- Add scoped diagram, arrow, font, and baseline styling.
+- Add a paper-based visual regression gallery and CTAN archive configuration.
+
 ## 0.2.0 — 2026-10-11
 
 - Add named rows and connections through `derhamdiagram`, `\derhamrow`, and `\derhamconnect`.

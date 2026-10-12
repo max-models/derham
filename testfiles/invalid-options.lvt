@@ -4,9 +4,11 @@
 \begin{document}
 \START
 \TYPE{invalid dimension}
-\[\derhamcomplex[dimension=4]\]
+\[\derhamcomplex[dimension=0]\]
 \TYPE{invalid range}
 \[\derhamcomplex[from=2,to=1]\]
+\TYPE{invalid vector dimension}
+\[\derhamcomplex[dimension=4,notation=vector]\]
 \TYPE{invalid list length}
 \[\derhamcomplex[dimension=2,custom-spaces={A,B}]\]
 \TYPE{invalid override index}
@@ -28,6 +30,12 @@
   \derhamrow[name=a]
   \derhamrow[name=b]
   \derhamconnect[from=a,to=b,degree=3]
+\end{derhamdiagram}\]
+\TYPE{incomplete targeted connection}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=a]
+  \derhamrow[name=b]
+  \derhamconnect[from=a,to=b,from-degree=0]
 \end{derhamdiagram}\]
 \END
 \end{document}

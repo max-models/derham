@@ -16,14 +16,14 @@
 \newcommand\opt[1]{\texttt{#1}}
 \title{\textsf{derham}\\[4pt]\large De Rham complexes and FEEC diagrams in LaTeX}
 \author{derham contributors}
-\date{Version 0.2.0 --- 11 October 2026}
+\date{Version 0.3.0 --- 12 October 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
 \pkg{derham} builds de Rham complexes and finite element exterior calculus (FEEC) diagrams from mathematical labels. It uses \pkg{tikz-cd} for layout and provides independent control of spaces, differential operators, and inter-row maps.
 \end{abstract}
 \begin{center}
-\small LPPL 1.3c or later. Version 0.2.0 adds the compositional API, mapped and coefficient-space diagrams, and generic dual and broken layouts. See \texttt{CHANGELOG.md} for the release history.
+\small LPPL 1.3c or later. Version 0.3.0 adds cross-degree row connections, arbitrary positive dimensions for generic and form notation, and local styling. See \texttt{CHANGELOG.md} for the release history.
 \end{center}
 \tableofcontents
 \clearpage
@@ -154,7 +154,36 @@ The \texttt{derhamdiagram} environment works in math mode. Declare named rows an
 \end{derhamdiagram}\]
 Each \verb|\derhamrow| accepts \opt{name}, \opt{kind}, \opt{spaces}, and \opt{operators}. Row kinds include \opt{continuous}, \opt{discrete}, \opt{reference}, \opt{coefficients}, \opt{conforming}, \opt{dual}, and \opt{broken}. Row lists have $n+1$ spaces and $n$ operators.
 
-Each \verb|\derhamconnect| accepts \opt{from}, \opt{to}, \opt{operator}, and optional \opt{degree}. The operator is repeated for an all-degree connection. For distinct labels by degree, declare individual connections.
+Each \verb|\derhamconnect| accepts \opt{from}, \opt{to}, \opt{operator}, and optional \opt{degree}. The operator is repeated for an all-degree connection. For distinct labels by degree, declare individual connections. Set both \opt{from-degree} and \opt{to-degree} to connect different columns:
+\begin{verbatim}
+\[\begin{derhamdiagram}[dimension=2,row-sep=huge]
+  \derhamrow[name=A]
+  \derhamrow[name=B]
+  \derhamconnect[from=A,to=B,from-degree=0,
+                 to-degree=1,operator=T]
+\end{derhamdiagram}\]
+\end{verbatim}
+\[\begin{derhamdiagram}[dimension=2,row-sep=huge]
+  \derhamrow[name=A]
+  \derhamrow[name=B]
+  \derhamconnect[from=A,to=B,from-degree=0,to-degree=1,operator=T]
+\end{derhamdiagram}\]
+Connections between different columns are rendered as diagonal arrows. Their mathematical meaning is supplied by the author.
+
+\section{Higher dimensions and styling}
+Generic and form notation accept any positive finite dimension. Indexed overrides work at every degree. Vector notation has built-in names only in dimensions 1--3. Wider diagrams may need smaller spacing or a landscape page.
+\begin{verbatim}
+\[\derhamcomplex[dimension=4,notation=forms,
+                  space-4=X^4,operator-3=D_3,
+                  column-sep=normal]\]
+\end{verbatim}
+\[\derhamcomplex[dimension=4,notation=forms,space-4=X^4,operator-3=D_3,column-sep=normal]\]
+Use \opt{arrow-style} for labeled-arrow options. Use \opt{diagram-style} for diagram-level \pkg{tikz-cd} options; \opt{font} and \opt{baseline} are shortcuts. Settings on one command are scoped to that diagram.
+\begin{verbatim}
+\[\derhamcommuting[dimension=1,arrow-style=blue,
+  font=\small,diagram-style={cells={nodes={draw=blue}}}]\]
+\end{verbatim}
+\[\derhamcommuting[dimension=1,arrow-style=blue,font=\small,diagram-style={cells={nodes={draw=blue}}}]\]
 
 \Needspace{.36\textheight}
 \section{Primal, dual, and broken rows}
@@ -176,7 +205,7 @@ Set \opt{broken-spaces}, \opt{broken-operators}, \opt{conforming-projection}, or
 \verb|\derhamsetup{...}| sets defaults in the current TeX scope. Options on a diagram command take priority and are local to that command.
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.42\linewidth}>{\raggedright\arraybackslash}p{.5\linewidth}@{}}\toprule
 Key & Meaning and default \\ \midrule\endhead
-\opt{dimension} & Integer 1, 2, or 3; default 3.\\
+\opt{dimension} & Positive integer; default 3. Built-in vector labels support 1--3.\\
 \opt{notation} & \opt{generic}, \opt{forms}, or \opt{vector}; default \opt{generic}.\\
 \opt{spaces} & \opt{generic} or \opt{sobolev}; default \opt{generic}.\\
 \opt{discrete} & Boolean, default \opt{false}; applies to \verb|\derhamcomplex|.\\
@@ -188,6 +217,8 @@ Key & Meaning and default \\ \midrule\endhead
 \opt{projection} & Base symbol for indexed vertical labels; default $\pi_h$.\\
 \opt{vertical-direction} & \opt{down} or \opt{up}; default \opt{down}.\\
 \opt{row-sep}, \opt{column-sep} & \pkg{tikz-cd} separation values; default \opt{large}.\\
+\opt{diagram-style}, \opt{arrow-style} & Scoped \pkg{tikz-cd} diagram and labeled-arrow options.\\
+\opt{font}, \opt{baseline} & Scoped diagram font and baseline settings.\\
 \opt{space-\emph{k}}, \opt{discrete-space-\emph{k}} & Override the degree-$k$ space.\\
 \opt{operator-\emph{k}}, \opt{discrete-operator-\emph{k}} & Override the arrow from degree $k$ to $k+1$.\\
 \opt{map-\emph{k}}, \opt{map-direction-\emph{k}} & Override a vertical map label or its direction.\\
@@ -218,7 +249,7 @@ The following labels follow the conforming FEEC projection relation in \href{htt
 \[\derhamcommuting[dimension=3,custom-discrete-spaces={V_h^{0,c},V_h^{1,c},V_h^{2,c},V_h^{3,c}},operators={\operatorname{grad},\operatorname{curl},\operatorname{div}},discrete-operators={\operatorname{grad}_h^c,\operatorname{curl}_h^c,\operatorname{div}_h^c},maps={\Pi_h^{0,c},\Pi_h^{1,c},\Pi_h^{2,c},\Pi_h^{3,c}}]\]
 
 \section{Limits and roadmap}
-Version 0.2 supports dimensions 1--3. Named rows may be stacked, but connections link corresponding degrees only. Arbitrary finite dimensions, separate column maps, advanced styling, and specific mapped multipatch presets remain future work. No externalization or automatic sizing is provided. A wide diagram may need a smaller \opt{column-sep}, a landscape page, or a paper-specific layout.
+Version 0.3 supports any positive dimension in generic and form notation, with built-in vector labels in dimensions 1--3. Named rows may be stacked and connected across degrees. Publication-specific mapped multipatch presets remain future work. No externalization or automatic sizing is provided. A wide diagram may need a smaller \opt{column-sep}, a landscape page, or a paper-specific layout. Adapted source examples are in \path{examples/paper-gallery.tex}.
 
 The mapped pullback convention follows the naturality of exterior differentiation described in \href{https://www-users.cse.umn.edu/~arnold/feec-cbms/feec.pdf}{Arnold's FEEC notes}. The distinction between conforming and broken spaces, primal and dual sequences, and patchwise versus projected operators follows \href{https://link.springer.com/article/10.1007/s10915-023-02351-x}{Güçlü, Campos Pinto, and Hadjout, Journal of Scientific Computing (2023)}. These sources motivate the examples; users must select operators and spaces for their own setting.
 

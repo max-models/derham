@@ -3,10 +3,10 @@ Don't change this file in any respect.
 invalid dimension
 LaTeX Font Info:    Trying to load font information for U+msa on input line ....
 LaTeX Font Info:    Trying to load font information for U+msb on input line ....
-! Package derham Error: Dimension must be 1, 2, or 3; got '4'.
+! Package derham Error: Dimension must be a positive integer; got '0'.
 Type <return> to continue.
  ...                                              
-l. ...\[\derhamcomplex[dimension=4]
+l. ...\[\derhamcomplex[dimension=0]
                                  \]
 LaTeX does not know anything more about this error, sorry.
 Try typing <return> to proceed.
@@ -17,6 +17,15 @@ Type <return> to continue.
  ...                                              
 l. ...\[\derhamcomplex[from=2,to=1]
                                  \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+invalid vector dimension
+! Package derham Error: Vector notation is defined only for dimensions 1--3.
+Type <return> to continue.
+ ...                                              
+l. ...\[\derhamcomplex[dimension=4,notation=vector]
+                                                  \]
 LaTeX does not know anything more about this error, sorry.
 Try typing <return> to proceed.
 If that doesn't work, type X <return> to quit.
@@ -39,13 +48,14 @@ LaTeX does not know anything more about this error, sorry.
 Try typing <return> to proceed.
 If that doesn't work, type X <return> to quit.
 unknown key
-! LaTeX Error: The key 'derham/nonsense' is unknown and is being ignored.
-For immediate help type H <return>.
+! Package derham Error: Unknown option 'nonsense'.
+Type <return> to continue.
  ...                                              
 l. ...\[\derhamcomplex[nonsense=true]
                                     \]
-The module 'derham' does not have a key called 'derham/nonsense'.
-Check that you have spelled the key name correctly.
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
 duplicate row
 ! Package derham Error: Row 'a' is already defined.
 Type <return> to continue.
@@ -69,6 +79,14 @@ Type <return> to continue.
  ...                                              
 l. ...\end{derhamdiagram}
                         \]
+LaTeX does not know anything more about this error, sorry.
+Try typing <return> to proceed.
+If that doesn't work, type X <return> to quit.
+incomplete targeted connection
+! Package derham Error: Set both from-degree and to-degree, or use degree for corresponding columns.
+Type <return> to continue.
+ ...                                              
+l. ...  \derhamconnect[from=a,to=b,from-degree=0]
 LaTeX does not know anything more about this error, sorry.
 Try typing <return> to proceed.
 If that doesn't work, type X <return> to quit.

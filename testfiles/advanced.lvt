@@ -1,0 +1,20 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{derham}
+\begin{document}
+\START
+\TYPE{four-dimensional form complex}
+\[\derhamcomplex[dimension=4,notation=forms,space-4=X^4,operator-3=D_3]\]
+\TYPE{four-dimensional indexed maps}
+\[\derhamcommuting[dimension=4,map-4=P_4,map-direction-4=up]\]
+\TYPE{targeted connection and scoped style}
+\[\begin{derhamdiagram}[dimension=2,arrow-style={red},font=\small,
+  diagram-style={cells={nodes={draw=blue}}},baseline=0]
+  \derhamrow[name=a]
+  \derhamrow[name=b]
+  \derhamconnect[from=a,to=b,from-degree=0,to-degree=1,operator=T]
+\end{derhamdiagram}\]
+\TYPE{style did not leak}
+\[\derhamcomplex[dimension=1]\]
+\END
+\end{document}

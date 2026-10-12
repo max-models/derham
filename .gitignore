@@ -7,3 +7,5 @@
 build/
 tmp/
 examples/*.pdf
+/paper-gallery.pdf
+/derham-ctan.zip
