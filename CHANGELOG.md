@@ -6,6 +6,7 @@
 - Support any positive dimension with generic or differential-form labels and dynamic indexed overrides.
 - Add scoped diagram, arrow, font, and baseline styling.
 - Add a paper-based visual regression gallery and CTAN archive configuration.
+- Preserve custom row operator labels after later rows are declared.
 
 ## 0.2.0 — 2026-10-11
 

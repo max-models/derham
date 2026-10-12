@@ -201,6 +201,14 @@
 
 \NewDocumentCommand \derhamsetup {m} {\keys_set:nn {derham}{#1}}
 
+% Pop to the requested position so the retrieved label stays unexpanded.
+\cs_new_protected:Npn \__derham_clist_item:NNn #1#2#3
+  {
+    \clist_set_eq:NN \l_tmpa_clist #1
+    \int_step_inline:nn {#3}
+      {\clist_pop:NN \l_tmpa_clist #2}
+  }
+
 \cs_new_protected:Npn \__derham_check_list:Nnn #1#2#3
   {
     \clist_if_empty:NF #1
@@ -274,7 +282,7 @@
           {
             \clist_if_empty:NTF \l__derham_custom_discrete_spaces_clist
               {\tl_set:Nn #3 {V_h^{#2}}}
-              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_custom_discrete_spaces_clist {\int_eval:n {#2+1}}}}}
+              {\__derham_clist_item:NNn \l__derham_custom_discrete_spaces_clist #3 {#2+1}}
           }
       }
       {
@@ -290,7 +298,7 @@
                   }
                   {\tl_set:Nn #3 {V^{#2}}}
               }
-              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_custom_spaces_clist {\int_eval:n {#2+1}}}}}
+              {\__derham_clist_item:NNn \l__derham_custom_spaces_clist #3 {#2+1}}
           }
       }
   }
@@ -312,7 +320,7 @@
           {
             \clist_if_empty:NTF \l__derham_discrete_operators_clist
               {\tl_set:Nn #3 {d_h^{#2}}}
-              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_discrete_operators_clist {\int_eval:n {#2+1}}}}}
+              {\__derham_clist_item:NNn \l__derham_discrete_operators_clist #3 {#2+1}}
           }
       }
       {
@@ -324,7 +332,7 @@
                   {\__derham_vector_operator:nN {#2} #3}
                   {\tl_set:Nn #3 {d^{#2}}}
               }
-              {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_operators_clist {\int_eval:n {#2+1}}}}}
+              {\__derham_clist_item:NNn \l__derham_operators_clist #3 {#2+1}}
           }
       }
   }
@@ -343,7 +351,7 @@
       {
         \clist_if_empty:NTF \l__derham_maps_clist
           {\tl_set:Nx #2 {\exp_not:V \l__derham_projection_tl ^{#1}}}
-          {\tl_set:Nx #2 {\exp_not:o {\clist_item:Nn \l__derham_maps_clist {\int_eval:n {#1+1}}}}}
+          {\__derham_clist_item:NNn \l__derham_maps_clist #2 {#1+1}}
       }
   }
 \cs_generate_variant:Nn \prop_put:Nnn {NVn,NVV,Nnx}
@@ -416,14 +424,14 @@
               {
                 \clist_if_empty:NTF #3
                   {\__derham_default_space:nnN {#2}{##1} \l__derham_label_tl}
-                  {\tl_set:Nx \l__derham_label_tl {\exp_not:o {\clist_item:Nn #3 {\int_eval:n {##1+1}}}}}
+                  {\__derham_clist_item:NNn #3 \l__derham_label_tl {##1+1}}
                 \tl_set:Nx \l__derham_key_tl {#1/##1}
                 \prop_put:NVV \l__derham_row_space_prop \l__derham_key_tl \l__derham_label_tl
                 \int_compare:nNnT {##1} < {\l__derham_dimension_int}
                   {
                     \clist_if_empty:NTF #4
                       {\__derham_default_operator:nnN {#2}{##1} \l__derham_label_tl}
-                      {\tl_set:Nx \l__derham_label_tl {\exp_not:o {\clist_item:Nn #4 {\int_eval:n {##1+1}}}}}
+                      {\__derham_clist_item:NNn #4 \l__derham_label_tl {##1+1}}
                     \prop_put:NVV \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
                   }
               }
@@ -752,7 +760,7 @@
                   {\tl_set:Nx #3 {\exp_not:V \l__derham_dof_tl ^{#2}}}
               }
           }
-          {\tl_set:Nx #3 {\exp_not:o {\clist_item:Nn \l__derham_maps_clist {\int_eval:n {#2+1}}}}}
+          {\__derham_clist_item:NNn \l__derham_maps_clist #3 {#2+1}}
       }
   }
 \cs_new_protected:Npn \__derham_add_preset_maps:nnn #1#2#3

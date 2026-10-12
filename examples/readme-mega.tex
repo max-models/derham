@@ -1,0 +1,24 @@
+\documentclass[border=18pt]{standalone}
+\usepackage{derham}
+\begin{document}
+\(\begin{derhamdiagram}[
+  dimension=8,notation=forms,spaces=sobolev,
+  row-sep=huge,column-sep=huge
+]
+  \derhamrow[name=physical,kind=continuous]
+  \derhamrow[name=reference,kind=reference]
+  \derhamrow[name=discrete,kind=discrete]
+  \derhamrow[name=coefficients,kind=coefficients,
+    operators={D_0,D_1,D_2,D_3,D_4,D_5,D_6,D_7}]
+  \derhamrow[name=dual,kind=dual]
+  \derhamconnect[from=physical,to=reference,operator=F^*]
+  \derhamconnect[from=reference,to=discrete,operator=\Pi_h]
+  \derhamconnect[from=discrete,to=coefficients,
+    operator=\operatorname{DoF}]
+  \derhamconnect[from=coefficients,to=dual,operator=\mathcal M]
+  \derhamconnect[from=physical,to=reference,
+    from-degree=0,to-degree=1,operator=T_0]
+  \derhamconnect[from=discrete,to=coefficients,
+    from-degree=6,to-degree=7,operator=B_6]
+\end{derhamdiagram}\)
+\end{document}

@@ -1,0 +1,16 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{derham}
+\begin{document}
+\START
+\TYPE{custom row operators remain available after later rows}
+\[\begin{derhamdiagram}[dimension=2]
+  \derhamrow[name=coeff,kind=coefficients,operators={D_0,D_1}]
+  \derhamrow[name=dual,kind=dual]
+  \ExplSyntaxOn
+  \prop_get:NnN \l__derham_row_operator_prop {coeff/0} \l_tmpa_tl
+  \iow_term:x {FIRST-OPERATOR:~\tl_to_str:V \l_tmpa_tl}
+  \ExplSyntaxOff
+\end{derhamdiagram}\]
+\END
+\end{document}
