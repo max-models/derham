@@ -82,7 +82,7 @@ The [paper-based gallery PDF](output/pdf/paper-gallery.pdf) has diagrams adapted
 
 Run `l3build check` for regression tests, `l3build doc` to build the manual, or `l3build ctan` to prepare a CTAN submission archive. See the [specification](SPEC.md) and [changelog](CHANGELOG.md). Licensed under LPPL 1.3c or later.
 
-## The completely unnecessary mega-diagram
+## A slightly bigger diagram
 
 What if you need an eight-dimensional de Rham complex, its reference-domain cousin, a discrete complex, coefficient spaces, *and* dual spaces? Probably take a walk first. Then write:
 
