@@ -1,0 +1,5 @@
+nbclient>=0.10,<1
+nbformat>=5.10,<6
+ipykernel>=6,<8
+pymupdf>=1.24,<2
+tikzfigure>=0.4,<1

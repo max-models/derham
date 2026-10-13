@@ -1,0 +1,53 @@
+---
+// The strip at the top of a guide page: download the notebook and open it on GitHub
+// (written by tools/notebooks.py).
+import { withBase } from '../utils/base';
+
+export interface Props {
+	/** Site-root path of the downloadable notebook under public/, e.g. "/guides/example-guide/example_guide.ipynb". */
+	download: string;
+	/** Repository path of the notebook, e.g. "guides/example_guide.ipynb". */
+	source: string;
+	/** "executed" (outputs from a run at build time) or "not run". */
+	status?: 'executed' | 'not run';
+}
+const { download, source, status = 'executed' } = Astro.props;
+const github = `https://github.com/max-models/derham/blob/main/${source}`;
+const notes = {
+	executed: 'Run when the site was built.',
+	'not run': 'Not run for this build: the outputs are missing.',
+};
+---
+
+<div class="notebook-header not-content">
+	<a class="notebook-button" href={withBase(download)} download>Download notebook</a>
+	<a class="notebook-button secondary" href={github}>View on GitHub</a>
+	<span class="notebook-note">{notes[status]}</span>
+</div>
+
+<style>
+	.notebook-header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem 0.8rem;
+		margin-block: 0 1.5rem;
+		font-size: var(--sl-text-sm);
+	}
+	.notebook-button {
+		padding: 0.35rem 0.9rem;
+		border: 1px solid var(--sl-color-text-accent);
+		border-radius: 999px;
+		background: var(--sl-color-text-accent);
+		color: var(--sl-color-text-invert);
+		text-decoration: none;
+		font-weight: 600;
+	}
+	.notebook-button.secondary {
+		background: transparent;
+		color: var(--sl-color-text-accent);
+	}
+	.notebook-note {
+		color: var(--sl-color-gray-3);
+	}
+</style>

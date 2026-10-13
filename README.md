@@ -6,6 +6,8 @@ Meet **`derham`**. Tell it which spaces and maps you mean; it lines them up for 
 
 It uses `tikz-cd` underneath and is aimed at de Rham complexes, commuting diagrams, and finite element exterior calculus (FEEC). A diagram is still not a proof, however handsome the arrows are.
 
+Read the [web guide](https://max-models.github.io/derham/) or download the [executable tutorial notebook](guides/derham_tutorial.ipynb) for compiled examples.
+
 ## Quick start
 
 Place `derham.sty` beside your document, or install it in your local TeX tree. The package requires a current LaTeX installation with `amsmath` and `tikz-cd`.

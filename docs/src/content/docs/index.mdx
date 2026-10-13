@@ -1,0 +1,35 @@
+---
+title: derham
+description: De Rham complexes and FEEC diagrams in LaTeX.
+template: splash
+hero:
+  tagline: De Rham complexes, commuting squares, and FEEC diagrams without redrawing every arrow.
+  actions:
+    - text: Get started
+      link: /derham/getting-started/installation/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/max-models/derham
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What can it draw?
+
+<CardGrid>
+  <Card title="Complexes" icon="open-book">One command draws continuous or discrete de Rham sequences in dimensions 1–3, or form complexes in higher dimensions.</Card>
+  <Card title="Commuting diagrams" icon="puzzle">Align continuous and discrete rows, then label each horizontal and vertical map.</Card>
+  <Card title="Mapped domains" icon="rocket">Draw physical and reference complexes with pullbacks in the correct direction.</Card>
+  <Card title="Custom layouts" icon="setting">Compose rows and connections for coefficient, dual, and broken-space diagrams.</Card>
+</CardGrid>
+
+## Start here
+
+<CardGrid>
+  <LinkCard title="Installation" href="/derham/getting-started/installation/" description="Add derham.sty to your TeX setup." />
+  <LinkCard title="Quickstart" href="/derham/getting-started/quickstart/" description="Your first complex and commuting diagram." />
+  <LinkCard title="Tutorial" href="/derham/guides/derham-tutorial/" description="Executable notebook with compiled LaTeX examples." />
+  <LinkCard title="Reference" href="/derham/reference/options/" description="Commands, keys, and defaults." />
+</CardGrid>

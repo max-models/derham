@@ -1,0 +1,23 @@
+---
+// A static image output of a notebook cell, stored under public/ (written by tools/notebooks.py).
+export interface Props {
+	/** Site-root path of the image, e.g. "/guides/example-guide/1.png". */
+	src: string;
+	alt?: string;
+}
+const { src, alt = 'Notebook output' } = Astro.props;
+const resolved = import.meta.env.BASE_URL.replace(/\/$/, '') + src;
+---
+
+<img class="notebook-image" src={resolved} alt={alt} loading="lazy" />
+
+<style>
+	.notebook-image {
+		display: block;
+		max-width: 100%;
+		height: auto;
+		margin-block: 1rem;
+		border-radius: 0.25rem;
+		background: white;
+	}
+</style>

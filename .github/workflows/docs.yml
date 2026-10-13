@@ -1,0 +1,65 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: docs/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+      - name: Install TeX Live and notebook dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-pictures texlive-fonts-recommended
+          python -m pip install -r docs/requirements.txt
+      - name: Build documentation
+        working-directory: docs
+        run: |
+          npm ci
+          DOCS_PYTHON="$(command -v python)" npm run build
+          npm run check:mdx
+      - name: Smoke test pages and base path
+        working-directory: docs
+        run: |
+          for page in /index.html /getting-started/installation/index.html /getting-started/quickstart/index.html /guides/derham-tutorial/index.html /reference/options/index.html /reference/conventions/index.html /development/docs/index.html /development/publishing/index.html; do
+            test -f "dist$page" || { echo "missing dist$page"; exit 1; }
+          done
+          grep -q 'href="/derham/' dist/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/dist
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

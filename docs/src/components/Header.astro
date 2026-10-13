@@ -1,0 +1,107 @@
+---
+// A top nav bar with the site title, a row of section links, then search, socials and theme.
+// Starlight's default Header has no link row, so this replaces it.
+import config from 'virtual:starlight/user-config';
+import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
+import Search from 'virtual:starlight/components/Search';
+import SiteTitle from 'virtual:starlight/components/SiteTitle';
+import SocialIcons from 'virtual:starlight/components/SocialIcons';
+import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
+import { withBase } from '../utils/base';
+
+const shouldRenderSearch =
+	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+
+const navLinks = [
+	{ label: 'Getting started', href: withBase('/getting-started/installation/'), section: withBase('/getting-started/') },
+	{ label: 'Development', href: withBase('/development/docs/'), section: withBase('/development/') },
+	{ label: 'Reference', href: withBase('/reference/options/'), section: withBase('/reference/') },
+];
+
+const { pathname } = Astro.url;
+const isCurrent = (section: string) => pathname.startsWith(section);
+---
+
+<div class="header">
+	<div class="title-wrapper sl-flex">
+		<SiteTitle />
+	</div>
+	<nav class="topnav sl-hidden md:sl-flex" aria-label="Primary">
+		{
+			navLinks.map((link) => (
+				<a href={link.href} class:list={['topnav-link', { current: isCurrent(link.section) }]}>
+					{link.label}
+				</a>
+			))
+		}
+	</nav>
+	<div class="sl-flex print:hidden">
+		{shouldRenderSearch && <Search />}
+	</div>
+	<div class="sl-hidden md:sl-flex print:hidden right-group">
+		<div class="sl-flex social-icons">
+			<SocialIcons />
+		</div>
+		<ThemeSelect />
+		<LanguageSelect />
+	</div>
+</div>
+
+<style>
+	@layer starlight.core {
+		.header {
+			display: flex;
+			gap: var(--sl-nav-gap);
+			justify-content: space-between;
+			align-items: center;
+			height: 100%;
+		}
+
+		.title-wrapper {
+			overflow: clip;
+			padding: 0.25rem;
+			margin: -0.25rem;
+			min-width: 0;
+			flex-shrink: 0;
+		}
+
+		.topnav {
+			flex: 1;
+			gap: 1.75rem;
+			align-items: center;
+			padding-inline-start: 1.5rem;
+			min-width: 0;
+		}
+
+		.topnav-link {
+			font-size: var(--sl-text-sm);
+			font-weight: 600;
+			text-decoration: none;
+			white-space: nowrap;
+			color: var(--sl-color-gray-2);
+			padding-block: 0.25rem;
+			border-bottom: 2px solid transparent;
+		}
+
+		.topnav-link:hover {
+			color: var(--sl-color-white);
+		}
+
+		.topnav-link.current {
+			color: var(--sl-color-text-accent);
+			border-bottom-color: var(--sl-color-text-accent);
+		}
+
+		.right-group,
+		.social-icons {
+			gap: 1rem;
+			align-items: center;
+		}
+
+		.social-icons::after {
+			content: '';
+			height: 2rem;
+			border-inline-end: 1px solid var(--sl-color-gray-5);
+		}
+	}
+</style>

@@ -1,0 +1,16 @@
+---
+// Rich HTML output of a notebook cell (pandas tables, etc.), inserted as is.
+export interface Props {
+	html: string;
+}
+const { html } = Astro.props;
+---
+
+<div class="notebook-html" set:html={html} />
+
+<style>
+	.notebook-html {
+		overflow-x: auto;
+		margin-block: 1rem;
+	}
+</style>
