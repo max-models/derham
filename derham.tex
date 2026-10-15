@@ -152,9 +152,9 @@ The \texttt{derhamdiagram} environment works in math mode. Declare named rows an
   \derhamrow[name=reference,kind=reference]
   \derhamrow[name=discrete,kind=discrete]
 \end{derhamdiagram}\]
-Each \verb|\derhamrow| accepts \opt{name}, \opt{kind}, \opt{spaces}, and \opt{operators}. Row kinds include \opt{continuous}, \opt{discrete}, \opt{reference}, \opt{coefficients}, \opt{conforming}, \opt{dual}, and \opt{broken}. Row lists have $n+1$ spaces and $n$ operators.
+Each \verb|\derhamrow| accepts \opt{name}, \opt{kind}, \opt{spaces}, \opt{operators}, and \opt{arrows}. Set \opt{arrows=false} for a row of spaces without horizontal operator arrows, for example an intermediate row reached only by connections. Row kinds include \opt{continuous}, \opt{discrete}, \opt{reference}, \opt{coefficients}, \opt{conforming}, \opt{dual}, and \opt{broken}. Row lists have $n+1$ spaces and $n$ operators.
 
-Each \verb|\derhamconnect| accepts \opt{from}, \opt{to}, \opt{operator}, and optional \opt{degree}. The operator is repeated for an all-degree connection. For distinct labels by degree, declare individual connections. Set both \opt{from-degree} and \opt{to-degree} to connect different columns:
+Each \verb|\derhamconnect| accepts \opt{from}, \opt{to}, \opt{operator}, and optional \opt{degree}, \opt{style}, and \opt{label-style}. The operator is repeated for an all-degree connection. For distinct labels by degree, declare individual connections. Set both \opt{from-degree} and \opt{to-degree} to connect different columns:
 \begin{verbatim}
 \[\begin{derhamdiagram}[dimension=2,row-sep=huge]
   \derhamrow[name=A]
@@ -169,6 +169,26 @@ Each \verb|\derhamconnect| accepts \opt{from}, \opt{to}, \opt{operator}, and opt
   \derhamconnect[from=A,to=B,from-degree=0,to-degree=1,operator=T]
 \end{derhamdiagram}\]
 Connections between different columns are rendered as diagonal arrows. Their mathematical meaning is supplied by the author.
+
+Each connection also accepts \opt{style}, \pkg{tikz-cd} options for that arrow only, and \opt{label-style}, options for its label. They are added after any diagram-wide \opt{arrow-style}:
+\begin{verbatim}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=A]
+  \derhamrow[name=B]
+  \derhamrow[name=C]
+  \derhamconnect[from=A,to=B,operator=S,style={<->}]
+  \derhamconnect[from=A,to=C,degree=1,operator=T,
+    style={dotted,bend left=30},
+    label-style={description,near start}]
+\end{derhamdiagram}\]
+\end{verbatim}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=A]
+  \derhamrow[name=B]
+  \derhamrow[name=C]
+  \derhamconnect[from=A,to=B,operator=S,style={<->}]
+  \derhamconnect[from=A,to=C,degree=1,operator=T,style={dotted,bend left=30},label-style={description,near start}]
+\end{derhamdiagram}\]
 
 \section{Higher dimensions and styling}
 Generic and form notation accept any positive finite dimension. Indexed overrides work at every degree. Vector notation has built-in names only in dimensions 1--3. Wider diagrams may need smaller spacing or a landscape page.

@@ -1,0 +1,11 @@
+This is a generated file for the l3build validation system.
+Don't change this file in any respect.
+per-connection arrow and label styles
+LaTeX Font Info:    Trying to load font information for U+msa on input line ....
+LaTeX Font Info:    Trying to load font information for U+msb on input line ....
+CONNECTION-1: [<->] []
+CONNECTION-2: [dotted,bend right=30] [description,near start]
+CONNECTION-3: [] []
+row without operator arrows, with zero endpoints
+ROW-B-DIRECTION: none
+preset maps are unstyled
