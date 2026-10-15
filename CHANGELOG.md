@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add per-connection `style` and `label-style` options to `\derhamconnect`, for example dotted, bent, or two-headed arrows and `description` labels.
+- Add the `arrows` row option; `arrows=false` draws a row without horizontal operator arrows.
+
 ## 0.3.0 — 2026-10-12
 
 - Allow cross-degree connections between named diagram rows.
