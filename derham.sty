@@ -51,6 +51,10 @@
 \prop_new:N \l__derham_map_direction_override_prop
 \tl_new:N \l__derham_body_tl
 \tl_new:N \l__derham_label_tl
+\tl_new:N \l__derham_connect_style_tl
+\tl_new:N \l__derham_connect_label_style_tl
+\bool_new:N \l__derham_row_arrows_bool
+\bool_set_true:N \l__derham_row_arrows_bool
 \tl_new:N \l__derham_direction_tl
 \bool_new:N \l__derham_valid_bool
 \seq_new:N \l__derham_rows_seq
@@ -184,6 +188,7 @@
 \msg_new:nnn {derham}{invalid-direction}{Map~direction~must~be~up~or~down;~got~'#1'.}
 \msg_new:nnn {derham}{unknown-key}{Unknown~option~'#1'.}
 \cs_generate_variant:Nn \regex_extract_once:nnNTF {nVNTF}
+\cs_generate_variant:Nn \str_case:nnF {V}
 \int_step_inline:nnnn {0}{1}{3}
   {
     \keys_define:nn {derham}
@@ -417,9 +422,13 @@
           {
             \seq_put_right:Nn \l__derham_rows_seq {#1}
             \prop_put:Nnx \l__derham_row_index_prop {#1}{\seq_count:N \l__derham_rows_seq}
-            \str_if_eq:nnTF {#2}{dual}
-              {\prop_put:Nnn \l__derham_row_direction_prop {#1}{left}}
-              {\prop_put:Nnn \l__derham_row_direction_prop {#1}{right}}
+            \bool_if:NTF \l__derham_row_arrows_bool
+              {
+                \str_if_eq:nnTF {#2}{dual}
+                  {\prop_put:Nnn \l__derham_row_direction_prop {#1}{left}}
+                  {\prop_put:Nnn \l__derham_row_direction_prop {#1}{right}}
+              }
+              {\prop_put:Nnn \l__derham_row_direction_prop {#1}{none}}
             \int_step_inline:nnnn {0}{1}{\l__derham_dimension_int}
               {
                 \clist_if_empty:NTF #3
@@ -456,6 +465,10 @@
     \prop_put:NVV \l__derham_connection_prop \l__derham_key_tl \l__derham_temp_tl
     \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /label}
     \prop_put:NVV \l__derham_connection_prop \l__derham_key_tl #4
+    \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /style}
+    \prop_put:NVV \l__derham_connection_prop \l__derham_key_tl \l__derham_connect_style_tl
+    \tl_set:Nx \l__derham_key_tl {\int_use:N \l__derham_connection_int /label-style}
+    \prop_put:NVV \l__derham_connection_prop \l__derham_key_tl \l__derham_connect_label_style_tl
   }
 \cs_generate_variant:Nn \__derham_add_connection:nnnN {VVnN}
 \cs_new_protected:Npn \__derham_add_targeted_connection:nnnnN #1#2#3#4#5
@@ -534,9 +547,16 @@
             \tl_put_right:NV \l__derham_body_tl \l__derham_direction_tl
             \tl_if_empty:NF \l__derham_arrow_style_tl
               {\tl_put_right:Nn \l__derham_body_tl {,}\tl_put_right:NV \l__derham_body_tl \l__derham_arrow_style_tl}
+            \__derham_connection_field:nnN {#3}{style} \l__derham_temp_tl
+            \tl_if_empty:NF \l__derham_temp_tl
+              {\tl_put_right:Nn \l__derham_body_tl {,}\tl_put_right:NV \l__derham_body_tl \l__derham_temp_tl}
             \tl_put_right:Nn \l__derham_body_tl {,"}
             \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
-            \tl_put_right:Nn \l__derham_body_tl {"]}
+            \tl_put_right:Nn \l__derham_body_tl {"}
+            \__derham_connection_field:nnN {#3}{label-style} \l__derham_temp_tl
+            \tl_if_empty:NF \l__derham_temp_tl
+              {\tl_put_right:Nn \l__derham_body_tl {~}\tl_put_right:NV \l__derham_body_tl \l__derham_temp_tl}
+            \tl_put_right:Nn \l__derham_body_tl {]}
           }
       }
   }
@@ -546,30 +566,33 @@
     \prop_get:NVN \l__derham_row_space_prop \l__derham_key_tl \l__derham_label_tl
     \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
     \prop_get:NnN \l__derham_row_direction_prop {#1} \l__derham_direction_tl
-    \str_if_eq:VnTF \l__derham_direction_tl {left}
+    \str_if_eq:VnF \l__derham_direction_tl {none}
       {
-        \int_compare:nNnT {#2} > {\l__derham_from_int}
+        \str_if_eq:VnTF \l__derham_direction_tl {left}
           {
-            \tl_set:Nx \l__derham_key_tl {#1/\int_eval:n {#2-1}}
-            \prop_get:NVN \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
-            \tl_put_right:Nn \l__derham_body_tl {\arrow[l}
-            \tl_if_empty:NF \l__derham_arrow_style_tl
-              {\tl_put_right:Nn \l__derham_body_tl {,}\tl_put_right:NV \l__derham_body_tl \l__derham_arrow_style_tl}
-            \tl_put_right:Nn \l__derham_body_tl {,"}
-            \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
-            \tl_put_right:Nn \l__derham_body_tl {"]}
+            \int_compare:nNnT {#2} > {\l__derham_from_int}
+              {
+                \tl_set:Nx \l__derham_key_tl {#1/\int_eval:n {#2-1}}
+                \prop_get:NVN \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
+                \tl_put_right:Nn \l__derham_body_tl {\arrow[l}
+                \tl_if_empty:NF \l__derham_arrow_style_tl
+                  {\tl_put_right:Nn \l__derham_body_tl {,}\tl_put_right:NV \l__derham_body_tl \l__derham_arrow_style_tl}
+                \tl_put_right:Nn \l__derham_body_tl {,"}
+                \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
+                \tl_put_right:Nn \l__derham_body_tl {"]}
+              }
           }
-      }
-      {
-        \int_compare:nNnT {#2} < {\l__derham_to_int}
           {
-            \prop_get:NVN \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
-            \tl_put_right:Nn \l__derham_body_tl {\arrow[r}
-            \tl_if_empty:NF \l__derham_arrow_style_tl
-              {\tl_put_right:Nn \l__derham_body_tl {,}\tl_put_right:NV \l__derham_body_tl \l__derham_arrow_style_tl}
-            \tl_put_right:Nn \l__derham_body_tl {,"}
-            \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
-            \tl_put_right:Nn \l__derham_body_tl {"]}
+            \int_compare:nNnT {#2} < {\l__derham_to_int}
+              {
+                \prop_get:NVN \l__derham_row_operator_prop \l__derham_key_tl \l__derham_label_tl
+                \tl_put_right:Nn \l__derham_body_tl {\arrow[r}
+                \tl_if_empty:NF \l__derham_arrow_style_tl
+                  {\tl_put_right:Nn \l__derham_body_tl {,}\tl_put_right:NV \l__derham_body_tl \l__derham_arrow_style_tl}
+                \tl_put_right:Nn \l__derham_body_tl {,"}
+                \tl_put_right:NV \l__derham_body_tl \l__derham_label_tl
+                \tl_put_right:Nn \l__derham_body_tl {"]}
+              }
           }
       }
     \str_if_eq:VnT \l__derham_direction_tl {left}
@@ -586,8 +609,11 @@
     \prop_get:NnN \l__derham_row_direction_prop {#1} \l__derham_direction_tl
     \bool_if:NT \l__derham_zero_start_bool
       {
-        \str_if_eq:VnTF \l__derham_direction_tl {left}
-          {\tl_put_right:Nn \l__derham_body_tl {0\&}}
+        \str_case:VnF \l__derham_direction_tl
+          {
+            {left}{\tl_put_right:Nn \l__derham_body_tl {0\&}}
+            {none}{\tl_put_right:Nn \l__derham_body_tl {\&}}
+          }
           {\tl_put_right:Nn \l__derham_body_tl {0\arrow[r]\&}}
       }
     \int_step_inline:nnnn {\l__derham_from_int}{1}{\l__derham_to_int}
@@ -599,8 +625,11 @@
     \prop_get:NnN \l__derham_row_direction_prop {#1} \l__derham_direction_tl
     \bool_if:NT \l__derham_zero_end_bool
       {
-        \str_if_eq:VnTF \l__derham_direction_tl {left}
-          {\tl_put_right:Nn \l__derham_body_tl {\&0\arrow[l]}}
+        \str_case:VnF \l__derham_direction_tl
+          {
+            {left}{\tl_put_right:Nn \l__derham_body_tl {\&0\arrow[l]}}
+            {none}{\tl_put_right:Nn \l__derham_body_tl {\&}}
+          }
           {\tl_put_right:Nn \l__derham_body_tl {\arrow[r]\&0}}
       }
   }
@@ -645,7 +674,8 @@
     kind / broken .code:n = {\tl_set:Nn \l__derham_row_kind_tl {broken}},
     kind / conforming .code:n = {\tl_set:Nn \l__derham_row_kind_tl {conforming}},
     spaces .clist_set:N = \l__derham_row_spaces_clist,
-    operators .clist_set:N = \l__derham_row_operators_clist
+    operators .clist_set:N = \l__derham_row_operators_clist,
+    arrows .bool_set:N = \l__derham_row_arrows_bool
   }
 \keys_define:nn {derham/connect}
   {
@@ -654,7 +684,9 @@
     operator .tl_set:N = \l__derham_connect_operator_tl,
     degree .int_set:N = \l__derham_connect_degree_int,
     from-degree .int_set:N = \l__derham_connect_from_degree_int,
-    to-degree .int_set:N = \l__derham_connect_to_degree_int
+    to-degree .int_set:N = \l__derham_connect_to_degree_int,
+    style .tl_set:N = \l__derham_connect_style_tl,
+    label-style .tl_set:N = \l__derham_connect_label_style_tl
   }
 \NewDocumentEnvironment {derhamdiagram} {O{}}
   {\group_begin:\keys_set:nn {derham}{#1}\__derham_validate:\__derham_engine_clear:\bool_set_true:N \l__derham_diagram_active_bool}
@@ -667,6 +699,7 @@
         \tl_set:Nn \l__derham_row_kind_tl {top}
         \clist_clear:N \l__derham_row_spaces_clist
         \clist_clear:N \l__derham_row_operators_clist
+        \bool_set_true:N \l__derham_row_arrows_bool
         \keys_set:nn {derham/row}{#1}
         \tl_if_empty:VTF \l__derham_row_name_tl
           {\msg_error:nn {derham}{missing-name}\bool_set_false:N \l__derham_valid_bool}
@@ -684,6 +717,8 @@
         \int_set:Nn \l__derham_connect_degree_int {-1}
         \int_set:Nn \l__derham_connect_from_degree_int {-1}
         \int_set:Nn \l__derham_connect_to_degree_int {-1}
+        \tl_clear:N \l__derham_connect_style_tl
+        \tl_clear:N \l__derham_connect_label_style_tl
         \keys_set:nn {derham/connect}{#1}
         \bool_if:nTF
           {\int_compare_p:n {\l__derham_connect_from_degree_int = -1}

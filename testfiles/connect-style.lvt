@@ -1,0 +1,37 @@
+\input regression-test.tex
+\documentclass{article}
+\usepackage{derham}
+\begin{document}
+\START
+\TYPE{per-connection arrow and label styles}
+\[\begin{derhamdiagram}[dimension=1]
+  \derhamrow[name=a]
+  \derhamrow[name=b]
+  \derhamrow[name=c]
+  \derhamconnect[from=a,to=b,degree=0,operator=S,style={<->}]
+  \derhamconnect[from=a,to=c,degree=1,operator=T,
+                 style={dotted,bend right=30},label-style={description,near start}]
+  \derhamconnect[from=b,to=c,degree=0,operator=U]
+  \ExplSyntaxOn
+  \int_step_inline:nn {3}
+    {
+      \prop_get:NnN \l__derham_connection_prop {#1/style} \l_tmpa_tl
+      \prop_get:NnN \l__derham_connection_prop {#1/label-style} \l_tmpb_tl
+      \iow_term:x {CONNECTION-#1:~[\tl_to_str:V \l_tmpa_tl]~[\tl_to_str:V \l_tmpb_tl]}
+    }
+  \ExplSyntaxOff
+\end{derhamdiagram}\]
+\TYPE{row without operator arrows, with zero endpoints}
+\[\begin{derhamdiagram}[dimension=1,zero-start=true,zero-end=true]
+  \derhamrow[name=a]
+  \derhamrow[name=b,arrows=false]
+  \derhamconnect[from=a,to=b]
+  \ExplSyntaxOn
+  \prop_get:NnN \l__derham_row_direction_prop {b} \l_tmpa_tl
+  \iow_term:x {ROW-B-DIRECTION:~\tl_to_str:V \l_tmpa_tl}
+  \ExplSyntaxOff
+\end{derhamdiagram}\]
+\TYPE{preset maps are unstyled}
+\[\derhamcommuting[dimension=1]\]
+\END
+\end{document}
